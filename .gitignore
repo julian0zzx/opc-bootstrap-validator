@@ -1,0 +1,19 @@
+# 运行时产物：状态档案落在 cwd，不进仓库
+opc-bootstrap-state.json
+*.state.json
+
+# 生成的报告（决策书 / 看板）属于输出，不作为源码提交
+OPC*.html
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 编辑器与系统
+.DS_Store
+.vscode/
+.idea/
+AI文风标注报告.md
+/.workbuddy

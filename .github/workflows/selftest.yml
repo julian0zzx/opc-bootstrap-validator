@@ -1,0 +1,45 @@
+name: selftest
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 判据回归自检
+        run: python scripts/gate.py selftest
+
+      - name: 冒烟：主命令与两道硬拒绝
+        run: |
+          set -e
+          python scripts/gate.py assay  --config evals/demo_input.json > /dev/null
+          python scripts/gate.py modes  --config evals/demo_input.json > /dev/null
+          python scripts/gate.py board  --config evals/demo_input.json > /dev/null
+          python scripts/gate.py report --config evals/demo_input.json --out /tmp/report.html > /dev/null
+          python scripts/gate.py template --out /tmp/tpl.json > /dev/null
+
+      - name: 第一层未过时 modes 必须 rc=4（顺序闸门）
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys
+          d = json.load(open("evals/demo_input.json", encoding="utf-8"))
+          d.pop("layer2", None)
+          d["gate3"] = {"directions": []}
+          json.dump(d, open("/tmp/nodir.json", "w", encoding="utf-8"), ensure_ascii=False)
+          rc = subprocess.run([sys.executable, "scripts/gate.py", "modes",
+                               "--config", "/tmp/nodir.json"]).returncode
+          print("modes rc =", rc)
+          assert rc == 4, "期望 rc=4 BLOCKED_ORDER，实得 %s" % rc
+          PY

@@ -1,0 +1,253 @@
+{
+  "user": {
+    "name": "",
+    "date": "2026-09-15",
+    "audience": "external"
+  },
+  "signal_texts": [],
+  "gate1": {
+    "safety_cushion": {
+      "cash": null,
+      "monthly_essential": null,
+      "target_months": null
+    },
+    "redlines": {
+      "no_cushion_no_income": false,
+      "license_unobtainable": false,
+      "uncontrolled_risk": false,
+      "health_family_imbalance": false,
+      "full_time_breaks_life": false,
+      "illegal_acquisition": false
+    },
+    "soft_risks": [],
+    "stop_loss": {
+      "max_cash": "",
+      "max_weeks": "",
+      "min_result": ""
+    }
+  },
+  "score": {
+    "items": {
+      "motive_choice": {
+        "score": null,
+        "evidence": ""
+      },
+      "tolerate_uncertainty": {
+        "score": null,
+        "evidence": ""
+      },
+      "long_term_roles": {
+        "score": null,
+        "evidence": ""
+      },
+      "rejection_resilience": {
+        "score": null,
+        "evidence": ""
+      },
+      "full_cycle_paid": {
+        "score": null,
+        "evidence": ""
+      },
+      "sellable_skill": {
+        "score": null,
+        "evidence": ""
+      },
+      "boundary_judgment": {
+        "score": null,
+        "evidence": ""
+      },
+      "sales_learning": {
+        "score": null,
+        "evidence": ""
+      },
+      "cash_cushion": {
+        "score": null,
+        "evidence": ""
+      },
+      "time_capacity": {
+        "score": null,
+        "evidence": ""
+      },
+      "compliance_basics": {
+        "score": null,
+        "evidence": ""
+      },
+      "paid_evidence": {
+        "score": null,
+        "evidence": ""
+      },
+      "customer_clarity": {
+        "score": null,
+        "evidence": ""
+      },
+      "reachable_channel": {
+        "score": null,
+        "evidence": ""
+      },
+      "standardizable": {
+        "score": null,
+        "evidence": ""
+      },
+      "light_structure": {
+        "score": null,
+        "evidence": ""
+      }
+    }
+  },
+  "gate3": {
+    "directions": [
+      {
+        "name": "",
+        "basis": "past_results",
+        "scores": {
+          "pain_intensity": null,
+          "paid_proof": null,
+          "reachability": null,
+          "measurability": null,
+          "delivery_control": null,
+          "unit_econ": null,
+          "repeat_referral": null,
+          "compliance_dependency": null,
+          "founder_durability": null
+        },
+        "notes": ""
+      }
+    ],
+    "funnel": {
+      "targets": null,
+      "reached": null,
+      "interviews": null,
+      "advanced": null,
+      "proposals": null,
+      "quotes": null,
+      "payers": null,
+      "payments": null,
+      "deliveries": null,
+      "results": null,
+      "loss_reasons": {
+        "需求不足": 0,
+        "信任不足": 0,
+        "价格不足": 0,
+        "时机不对": 0,
+        "决策链不清": 0,
+        "交付不明确": 0
+      }
+    }
+  },
+  "gate4": {
+    "mso": {
+      "target_customer": "",
+      "scenario": "",
+      "pain": "",
+      "loss": "",
+      "min_result": "",
+      "deliverables": "",
+      "exclusions": "",
+      "client_inputs": "",
+      "cycle_days": "",
+      "acceptance": "",
+      "price_terms": "",
+      "why_me": "",
+      "channel_actions": "",
+      "direct_cost": "",
+      "delivery_hours": "",
+      "gross_profit": "",
+      "risks": "",
+      "stop_loss": "",
+      "goal_90d": ""
+    },
+    "delivery": {
+      "paying_customers": null,
+      "scope_controlled": null,
+      "econ_positive": null,
+      "feedback": "",
+      "follow_ons": null,
+      "compliant": null,
+      "still_willing": null
+    }
+  },
+  "econ": {
+    "target_hourly_rate": null,
+    "orders": [
+      {
+        "customer": "",
+        "revenue": null,
+        "direct_cost": null,
+        "hours": null
+      }
+    ],
+    "cac": null,
+    "monthly_contribution_per_customer": null
+  },
+  "tracking": {
+    "cash_spent": null,
+    "cash_limit": null,
+    "weeks_elapsed": null,
+    "weeks_limit": null,
+    "rounds": [
+      {
+        "round": 1,
+        "changed_vars": [],
+        "payments": 0
+      }
+    ],
+    "immediate": {
+      "illegal_or_uncontrollable": false,
+      "health_family_decline": false,
+      "debt_or_life_erosion": false
+    },
+    "suggest": {
+      "no_paying_after_repair": false,
+      "two_rounds_no_payment": false,
+      "paid_but_losing": false,
+      "imagined_feedback": false,
+      "burnout_no_growth": false,
+      "escape_only": false
+    }
+  },
+  "state": {
+    "path": ""
+  },
+  "layer2": {
+    "direction": "",
+    "description": "",
+    "revenue_source": "",
+    "risk_source": "",
+    "mode_key": "",
+    "overlays": [],
+    "slots": {
+      "north_star": "",
+      "process": [
+        "",
+        ""
+      ],
+      "safety": [
+        "",
+        ""
+      ]
+    },
+    "metrics": {
+      "acquire": "",
+      "deal": "",
+      "delivery": "",
+      "econ": "",
+      "customer": "",
+      "personal": ""
+    },
+    "concentration": null,
+    "cycles_paid": null,
+    "record": {
+      "我的 OPC 模式": "",
+      "主要收入来源": "",
+      "第一层五道闸门当前状态": "",
+      "北极星指标": "",
+      "过程指标 1": "",
+      "过程指标 2": "",
+      "安全指标 1": "",
+      "安全指标 2": "",
+      "本周期目标": "",
+      "继续、调整或暂停条件": "",
+      "数据来源和复盘日期": ""
+    }
+  }
+}

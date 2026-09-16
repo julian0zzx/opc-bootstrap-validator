@@ -1,0 +1,251 @@
+{
+  "user": {
+    "name": "示例创始人",
+    "date": "2026-09-15",
+    "audience": "external"
+  },
+  "signal_texts": [
+    "我的产品已经上线了，公众号粉丝也涨到 3000 了，感觉方向没问题",
+    "上个月有 2 个客户主动来问报价，其中 1 人约了 30 分钟的方案沟通，还给了店铺后台截图"
+  ],
+  "gate1": {
+    "safety_cushion": {
+      "cash": 120000,
+      "monthly_essential": 30000,
+      "target_months": 6
+    },
+    "redlines": {},
+    "soft_risks": [
+      "no_full_cycle",
+      "single_dependency"
+    ],
+    "stop_loss": {
+      "max_cash": "不超过可支配现金的 5%",
+      "max_weeks": "8 周或 3 个验证周期",
+      "min_result": "至少 2 个付费客户，单客毛利为正"
+    }
+  },
+  "score": {
+    "items": {
+      "motive_choice": {
+        "score": 4,
+        "evidence": "2025 年起持续投入这件事，是想清楚了要经营业务，不只是不想上班"
+      },
+      "tolerate_uncertainty": {
+        "score": 4,
+        "evidence": "没人盯着也连续推进了 6 个月，周报都在"
+      },
+      "long_term_roles": {
+        "score": 4,
+        "evidence": "销售、交付、售后都自己扛，近半年做过 3 次售后复盘"
+      },
+      "rejection_resilience": {
+        "score": 4,
+        "evidence": "被拒 20 多次，期间改过两次 Offer 结构"
+      },
+      "full_cycle_paid": {
+        "score": 5,
+        "evidence": "独立完成 3 笔回款，累计 4.2 万元，交付记录齐全"
+      },
+      "sellable_skill": {
+        "score": 4,
+        "evidence": "作品集有 6 个案例，其中 3 个拿到客户署名许可"
+      },
+      "boundary_judgment": {
+        "score": 4,
+        "evidence": "写了不服务清单，并据此拒掉 2 个超出交付范围的需求"
+      },
+      "sales_learning": {
+        "score": 4,
+        "evidence": "触达 60 次、报价 8 次，报价单和客户异议都已记录"
+      },
+      "cash_cushion": {
+        "score": 4,
+        "evidence": "安全垫 4 个月，现金台账和止损触发线都已建好"
+      },
+      "time_capacity": {
+        "score": 4,
+        "evidence": "每周固定 20 小时投入，家庭时间也已排好"
+      },
+      "compliance_basics": {
+        "score": 3,
+        "evidence": "合同模板初稿和风险清单已有，财税与数据合规还在补"
+      },
+      "paid_evidence": {
+        "score": 5,
+        "evidence": "2 个付费客户，其中 1 笔定金、1 笔全款，凭证都在"
+      },
+      "customer_clarity": {
+        "score": 4,
+        "evidence": "能点名 8 个具体客户，并复述他们的痛点原话"
+      },
+      "reachable_channel": {
+        "score": 4,
+        "evidence": "抖音和知乎两条渠道，私信回复率 8%，固定触达动作跑过 3 轮"
+      },
+      "standardizable": {
+        "score": 4,
+        "evidence": "SOP 覆盖 90% 的交付步骤，AI 只做整理和初稿，交付责任仍在本人"
+      },
+      "light_structure": {
+        "score": 5,
+        "evidence": ""
+      }
+    }
+  },
+  "gate3": {
+    "directions": [
+      {
+        "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+        "basis": "past_results",
+        "scores": {
+          "pain_intensity": 5,
+          "paid_proof": 4,
+          "reachability": 4,
+          "measurability": 5,
+          "delivery_control": 4,
+          "unit_econ": 4,
+          "repeat_referral": 4,
+          "compliance_dependency": 4,
+          "founder_durability": 5
+        },
+        "notes": "旺季客服咨询爆量，店主已在花钱买客服外包"
+      },
+      {
+        "name": "为内容团队做 AI 选题与脚本批量生成",
+        "basis": "fast_deliverable",
+        "scores": {
+          "pain_intensity": 4,
+          "paid_proof": 3,
+          "reachability": 3,
+          "measurability": 3,
+          "delivery_control": 3,
+          "unit_econ": 3,
+          "repeat_referral": 3,
+          "compliance_dependency": 2,
+          "founder_durability": 4
+        },
+        "notes": "版权与平台规则风险偏高"
+      }
+    ],
+    "funnel": {
+      "targets": 60,
+      "reached": 26,
+      "interviews": 14,
+      "advanced": 5,
+      "proposals": 4,
+      "quotes": 3,
+      "payers": 0,
+      "payments": 0,
+      "deliveries": 0,
+      "results": 0
+    },
+    "loss_reasons": {
+      "需求不足": 1,
+      "信任不足": 6,
+      "价格不足": 2,
+      "时机不对": 1,
+      "决策链不清": 2,
+      "交付不明确": 2
+    }
+  },
+  "gate4": {
+    "mso": {
+      "target_customer": "月销 5–50 万美元的跨境小卖家（3–10 人团队）",
+      "scenario": "旺季客服咨询量翻倍，店主临时拉人顶班仍处理不过来",
+      "pain": "高频问题重复出现，老客服离职后话术和执行标准断层",
+      "loss": "按每月浪费 60 小时客服工时、错失约 8% 询单转化估算",
+      "min_result": "7 天内交付一套可直接复用的客服知识库与回复模板",
+      "deliverables": "1 份结构化知识库文档 + 20 条高频问题回复模板 + 1 段使用说明",
+      "exclusions": "",
+      "client_inputs": "",
+      "cycle_days": 7,
+      "acceptance": "覆盖 80% 以上的高频问题；模板可直接复制使用，无需二次改写",
+      "price": 8000,
+      "price_terms": "价格 8000 元，首付 50% 定金，交付前付尾款；变更范围需另行报价；延期按天折算；未达验收标准可申请一次免费返工，仍不达标按比例退款；双方保密；成果归属客户；交付后 7 天内提供售后答疑",
+      "why_me": "3 年跨境客服运营经验，做过 2 个同类知识库并留存客户评价",
+      "channel_actions": "知乎每周 2 篇实操文 + 抖音每周 3 条案例短视频",
+      "direct_cost": "300 元（模板工具与素材订阅）",
+      "delivery_hours": "12 小时",
+      "gross_profit": "约 4400 元",
+      "risks": "客户聊天记录含买家个人信息，需最小化收集并签署数据处理约定；不使用未授权素材",
+      "stop_loss": "最大投入 2000 元，最长 8 周，最低 2 个付费客户",
+      "goal_90d": "3 个付费客户且单客毛利为正，沉淀 1 套可复用模板库"
+    },
+    "delivery": {
+      "paying_customers": 0,
+      "scope_controlled": true,
+      "econ_positive": true,
+      "feedback": "客户反馈知识库上线后客服首响时间明显缩短，模板直接可用",
+      "follow_ons": 0,
+      "compliant": true,
+      "still_willing": true
+    }
+  },
+  "tracking": {
+    "cash_spent": 900,
+    "cash_limit": 2000,
+    "weeks_elapsed": 4,
+    "weeks_limit": 8,
+    "rounds": [
+      {
+        "round": 1,
+        "changed_vars": [
+          "价格",
+          "交付范围"
+        ],
+        "payments": 0,
+        "note": "从 12000 降到 8000，去掉系统对接"
+      }
+    ],
+    "immediate": {},
+    "suggest": {
+      "imagined_feedback": false
+    }
+  },
+  "econ": {
+    "target_hourly_rate": 300,
+    "orders": [
+      {
+        "customer": "过往项目 甲",
+        "revenue": 18000,
+        "direct_cost": 2200,
+        "hours": 46
+      },
+      {
+        "customer": "过往项目 乙",
+        "revenue": 24000,
+        "direct_cost": 3500,
+        "hours": 38
+      }
+    ],
+    "cac": 1500,
+    "monthly_contribution_per_customer": 4200
+  },
+  "layer2": {
+    "direction": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+    "revenue_source": "客户按项目一次性付款，固定范围、固定周期、固定价格的服务包",
+    "risk_source": "交付范围蔓延、回款周期长、过度依赖我个人的时间",
+    "slots": {
+      "north_star": "客户续费或复购的套餐数",
+      "process": [
+        "每周发出的个性化提案数",
+        "提案到定金的接受率"
+      ],
+      "safety": [
+        "套餐毛利",
+        "回款周期（天）"
+      ]
+    },
+    "metrics": {
+      "acquire": "新增 26 · 触达 26 · 访谈 14 · 提案 4",
+      "deal": "报价 3 · 定金 0 · 成交率 0%",
+      "delivery": "按时交付率 100% · 实际工时 84h",
+      "econ": "收入 4.2 万 · 贡献利润 1.1 万",
+      "customer": "复购 0 · 转介绍 0 · 投诉 0",
+      "personal": "每周 20h · 睡眠正常"
+    },
+    "concentration": 0.62,
+    "cycles_paid": 1
+  }
+}

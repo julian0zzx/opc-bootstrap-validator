@@ -1,0 +1,1441 @@
+{
+  "schema": "opc-bootstrap-validator/modes/1",
+  "engine": "opc-bootstrap-validator",
+  "source": "《OPC 单人创业自查与最小验证流程》第十二章 12.2 / 12.3 / 12.4 + 第九章 9.1 / 9.2",
+  "note": "模式目录用于归类与选指标，不得反用于选题：必须先由第四章四类证据生成候选方向。",
+  "categories": [
+    {
+      "key": "A",
+      "name": "专业服务与项目交付型",
+      "summary": "按项目或按时间出售专业能力。钱来自客户付款，主要风险是范围蔓延、账期拖长和个人时间被占满。",
+      "modes": [
+        {
+          "key": "A01",
+          "slug": "freelance_service",
+          "name": "自由职业服务",
+          "forms": "文案、翻译、设计、摄影、剪辑、程序开发、配音、校对、排版",
+          "aliases": [
+            "接单",
+            "外包",
+            "兼职接活"
+          ],
+          "pack": "P01",
+          "default_overlays": []
+        },
+        {
+          "key": "A02",
+          "slug": "consulting",
+          "name": "专业顾问",
+          "forms": "战略、品牌、营销、销售、组织、人力、财务、采购、供应链、出海顾问",
+          "aliases": [
+            "咨询",
+            "顾问",
+            "陪诊式咨询"
+          ],
+          "pack": "P01",
+          "default_overlays": []
+        },
+        {
+          "key": "A03",
+          "slug": "coaching",
+          "name": "教练与陪跑",
+          "forms": "职业、管理、健身、学习、写作、语言、表达、个人成长陪跑",
+          "aliases": [
+            "教练",
+            "私教",
+            "陪跑",
+            "辅导"
+          ],
+          "pack": "P03",
+          "default_overlays": []
+        },
+        {
+          "key": "A04",
+          "slug": "audit_assessment",
+          "name": "专业评估与审计",
+          "forms": "网站诊断、内容审计、广告审计、SEO 审计、流程审计、无障碍评估",
+          "aliases": [
+            "诊断",
+            "审计",
+            "体检",
+            "测评报告"
+          ],
+          "pack": "P01",
+          "default_overlays": []
+        },
+        {
+          "key": "A05",
+          "slug": "productized_service",
+          "name": "产品化服务",
+          "forms": "固定范围、固定周期、固定价格的报告、设计包、增长包或交付包",
+          "aliases": [
+            "套餐",
+            "标准化服务",
+            "定价包"
+          ],
+          "pack": "P02",
+          "default_overlays": []
+        },
+        {
+          "key": "A06",
+          "slug": "managed_ops",
+          "name": "代运营与托管",
+          "forms": "社交媒体、广告、店铺、社区、邮件、客户支持、搜索优化代运营",
+          "aliases": [
+            "代运营",
+            "托管",
+            "代办"
+          ],
+          "pack": "P02",
+          "default_overlays": []
+        },
+        {
+          "key": "A07",
+          "slug": "virtual_assistant",
+          "name": "虚拟助理与远程运营",
+          "forms": "行政、研究、数据整理、客户支持、项目协调、预约和资料管理",
+          "aliases": [
+            "助理",
+            "远程助理",
+            "行政外包"
+          ],
+          "pack": "P01",
+          "default_overlays": []
+        },
+        {
+          "key": "A08",
+          "slug": "micro_agency",
+          "name": "小型工作室或微型代理",
+          "forms": "由个人主导、按需调用外包或合作伙伴完成项目",
+          "aliases": [
+            "工作室",
+            "小代理",
+            "个人工作室"
+          ],
+          "pack": "P01",
+          "default_overlays": []
+        },
+        {
+          "key": "A09",
+          "slug": "recruiting_brokerage",
+          "name": "招聘、撮合与经纪",
+          "forms": "人才推荐、供应商撮合、品牌合作、创作者经纪、项目撮合",
+          "aliases": [
+            "猎头",
+            "经纪",
+            "中介",
+            "BD"
+          ],
+          "pack": "P04",
+          "default_overlays": []
+        },
+        {
+          "key": "A10",
+          "slug": "offline_light_service",
+          "name": "线下轻服务",
+          "forms": "摄影、维修、收纳、宠物服务、活动支持、上门教学、定制体验",
+          "aliases": [
+            "上门",
+            "本地服务",
+            "线下"
+          ],
+          "pack": "P01",
+          "default_overlays": []
+        }
+      ]
+    },
+    {
+      "key": "B",
+      "name": "软件、技术与自动化型",
+      "summary": "用代码或配置交付可复用的能力，赚钱方式多为订阅、授权或按调用量计费。依赖第三方、安全漏洞和技术债是主要隐患。",
+      "modes": [
+        {
+          "key": "B01",
+          "slug": "indie_product",
+          "name": "独立开发产品",
+          "forms": "Web 应用、移动应用、桌面工具、浏览器扩展、效率工具",
+          "aliases": [
+            "独立开发",
+            "app",
+            "工具站"
+          ],
+          "pack": "P05",
+          "default_overlays": []
+        },
+        {
+          "key": "B02",
+          "slug": "micro_saas",
+          "name": "Micro-SaaS",
+          "forms": "面向细分行业的订阅软件、轻量后台、报表或工作流工具",
+          "aliases": [
+            "saas",
+            "订阅软件",
+            "小工具订阅"
+          ],
+          "pack": "P05",
+          "default_overlays": []
+        },
+        {
+          "key": "B03",
+          "slug": "ai_app",
+          "name": "AI 应用与 AI Agent",
+          "forms": "客服、检索、写作、审核、分析、知识库、自动化代理",
+          "aliases": [
+            "agent",
+            "ai 工具",
+            "大模型应用",
+            "工作流自动化"
+          ],
+          "pack": "P05",
+          "default_overlays": []
+        },
+        {
+          "key": "B04",
+          "slug": "devtools_api",
+          "name": "API 与开发者工具",
+          "forms": "API、SDK、插件、组件库、开发框架、测试和部署工具",
+          "aliases": [
+            "api",
+            "sdk",
+            "插件",
+            "开发者工具"
+          ],
+          "pack": "P06",
+          "default_overlays": []
+        },
+        {
+          "key": "B05",
+          "slug": "nocode",
+          "name": "No-code/低代码方案",
+          "forms": "表单、数据库、自动化流程、企业内部小系统",
+          "aliases": [
+            "低代码",
+            "无代码",
+            "自动化流程",
+            "内部系统"
+          ],
+          "pack": "P05",
+          "default_overlays": []
+        },
+        {
+          "key": "B06",
+          "slug": "data_product",
+          "name": "数据产品",
+          "forms": "数据集、监测、行业数据库、价格追踪、舆情或市场情报",
+          "aliases": [
+            "数据集",
+            "数据库",
+            "监测",
+            "舆情",
+            "情报"
+          ],
+          "pack": "P07",
+          "default_overlays": []
+        },
+        {
+          "key": "B07",
+          "slug": "tech_template",
+          "name": "技术模板与代码资产",
+          "forms": "模板、脚手架、主题、组件、工作流、提示词系统",
+          "aliases": [
+            "脚手架",
+            "主题",
+            "组件库",
+            "提示词"
+          ],
+          "pack": "P06",
+          "default_overlays": []
+        },
+        {
+          "key": "B08",
+          "slug": "indie_game",
+          "name": "独立游戏与互动产品",
+          "forms": "Web 游戏、移动游戏、小游戏、互动故事、工具型游戏",
+          "aliases": [
+            "游戏",
+            "小游戏",
+            "互动产品"
+          ],
+          "pack": "P08",
+          "default_overlays": []
+        },
+        {
+          "key": "B09",
+          "slug": "infra_hosting",
+          "name": "数字基础设施托管",
+          "forms": "网站托管、自动化维护、备份、监控、部署和安全基础服务",
+          "aliases": [
+            "托管",
+            "运维",
+            "部署",
+            "监控"
+          ],
+          "pack": "P06",
+          "default_overlays": []
+        }
+      ]
+    },
+    {
+      "key": "C",
+      "name": "内容、创作者与知识资产型",
+      "summary": "先积累受众，再想办法变现。变现有订阅、稿酬、广告、课程、授权等多条路，风险则集中在平台依赖和版权上。",
+      "modes": [
+        {
+          "key": "C01",
+          "slug": "web_novel",
+          "name": "网文与连载作者",
+          "forms": "网络小说、短篇连载、剧本、漫画脚本、有声内容",
+          "aliases": [
+            "小说",
+            "连载",
+            "剧本",
+            "漫画脚本"
+          ],
+          "pack": "P09",
+          "default_overlays": []
+        },
+        {
+          "key": "C02",
+          "slug": "media_account",
+          "name": "新媒体账号",
+          "forms": "短视频、图文、直播、播客、视频号、垂直资讯账号",
+          "aliases": [
+            "账号",
+            "自媒体",
+            "短视频",
+            "小红书",
+            "公众号"
+          ],
+          "pack": "P10",
+          "default_overlays": []
+        },
+        {
+          "key": "C03",
+          "slug": "paid_newsletter",
+          "name": "付费通讯与研究报告",
+          "forms": "Newsletter、行业简报、投资/产业研究、数据周报",
+          "aliases": [
+            "newsletter",
+            "简报",
+            "周报",
+            "研究报告"
+          ],
+          "pack": "P11",
+          "default_overlays": []
+        },
+        {
+          "key": "C04",
+          "slug": "course",
+          "name": "课程与训练营",
+          "forms": "录播课、直播课、训练营、考试辅导、企业内训",
+          "aliases": [
+            "课程",
+            "训练营",
+            "培训",
+            "网课"
+          ],
+          "pack": "P12",
+          "default_overlays": []
+        },
+        {
+          "key": "C05",
+          "slug": "membership_community",
+          "name": "会员社群",
+          "forms": "付费社群、同行社区、资源群、问答社区、陪伴式会员",
+          "aliases": [
+            "社群",
+            "会员",
+            "付费群"
+          ],
+          "pack": "P13",
+          "default_overlays": []
+        },
+        {
+          "key": "C06",
+          "slug": "knowledge_column",
+          "name": "咨询内容与知识专栏",
+          "forms": "专栏、电子书、案例库、方法论订阅、问答订阅",
+          "aliases": [
+            "专栏",
+            "电子书",
+            "案例库"
+          ],
+          "pack": "P11",
+          "default_overlays": []
+        },
+        {
+          "key": "C07",
+          "slug": "podcast_video",
+          "name": "播客、音频与视频节目",
+          "forms": "广告、赞助、订阅、付费专辑、授权和周边",
+          "aliases": [
+            "播客",
+            "音频",
+            "视频节目"
+          ],
+          "pack": "P14",
+          "default_overlays": []
+        },
+        {
+          "key": "C08",
+          "slug": "personal_brand",
+          "name": "个人品牌与意见领袖",
+          "forms": "商业合作、演讲、咨询、课程、出版、授权",
+          "aliases": [
+            "个人品牌",
+            "ip",
+            "博主",
+            "达人"
+          ],
+          "pack": "P10",
+          "default_overlays": []
+        },
+        {
+          "key": "C09",
+          "slug": "ugc_assets",
+          "name": "UGC 与创意素材",
+          "forms": "用户生成内容、广告素材、摄影、插画、音乐、音效、字体",
+          "aliases": [
+            "素材",
+            "插画",
+            "摄影",
+            "音乐"
+          ],
+          "pack": "P16",
+          "default_overlays": []
+        },
+        {
+          "key": "C10",
+          "slug": "ip_licensing",
+          "name": "IP 与版权授权",
+          "forms": "角色、故事、插画、音乐、视频、商标或内容改编授权",
+          "aliases": [
+            "授权",
+            "版权",
+            "改编"
+          ],
+          "pack": "P17",
+          "default_overlays": []
+        }
+      ]
+    },
+    {
+      "key": "D",
+      "name": "数字产品与创意资产型",
+      "summary": "做一次、卖多次。下载和授权是主要收入来源；需要重点防的是盗版、内容过时和平台封禁。",
+      "modes": [
+        {
+          "key": "D01",
+          "slug": "templates_toolkit",
+          "name": "模板与工具包",
+          "forms": "PPT、表格、Notion、简历、合同、运营和项目管理模板",
+          "aliases": [
+            "模板",
+            "工具包",
+            "notion"
+          ],
+          "pack": "P15",
+          "default_overlays": []
+        },
+        {
+          "key": "D02",
+          "slug": "ebook_data_pack",
+          "name": "电子书与资料包",
+          "forms": "指南、手册、清单、案例库、研究资料、行业数据库",
+          "aliases": [
+            "电子书",
+            "资料包",
+            "手册",
+            "清单"
+          ],
+          "pack": "P15",
+          "default_overlays": []
+        },
+        {
+          "key": "D03",
+          "slug": "design_media_assets",
+          "name": "设计与媒体素材",
+          "forms": "图片、视频、音频、字体、图标、3D 模型、动效、滤镜",
+          "aliases": [
+            "字体",
+            "图标",
+            "3d 模型",
+            "滤镜"
+          ],
+          "pack": "P16",
+          "default_overlays": []
+        },
+        {
+          "key": "D04",
+          "slug": "printable_custom",
+          "name": "可打印和定制数字文件",
+          "forms": "海报、邀请函、学习资料、手帐、激光切割或 3D 打印文件",
+          "aliases": [
+            "可打印",
+            "手帐",
+            "激光切割",
+            "3d 打印"
+          ],
+          "pack": "P15",
+          "default_overlays": []
+        },
+        {
+          "key": "D05",
+          "slug": "digital_art_collectible",
+          "name": "数字艺术与收藏品",
+          "forms": "数字艺术、授权素材、可商用插画、虚拟物品",
+          "aliases": [
+            "数字艺术",
+            "收藏品",
+            "虚拟物品"
+          ],
+          "pack": "P16",
+          "default_overlays": []
+        },
+        {
+          "key": "D06",
+          "slug": "membership_library",
+          "name": "会员制数字资源库",
+          "forms": "持续更新的素材、案例、数据库、提示词或工作流",
+          "aliases": [
+            "资源库",
+            "素材库",
+            "知识库订阅"
+          ],
+          "pack": "P15",
+          "default_overlays": []
+        },
+        {
+          "key": "D07",
+          "slug": "whitelabel_asset",
+          "name": "授权型工具与白标资产",
+          "forms": "白标课程、白标软件、可授权内容、企业定制知识资产",
+          "aliases": [
+            "白标",
+            "贴牌",
+            "oem"
+          ],
+          "pack": "P17",
+          "default_overlays": []
+        }
+      ]
+    },
+    {
+      "key": "E",
+      "name": "电商、独立站与交易型",
+      "summary": "靠商品或流量的差价赚钱，订单和佣金构成收入。退款、物流、平台规则与合规是这一类的常见风险。",
+      "modes": [
+        {
+          "key": "E01",
+          "slug": "dtc_store",
+          "name": "独立站 DTC",
+          "forms": "自有品牌、自有商品、数字商品或订阅商品",
+          "aliases": [
+            "独立站",
+            "自有品牌",
+            "dtc"
+          ],
+          "pack": "P18",
+          "default_overlays": []
+        },
+        {
+          "key": "E02",
+          "slug": "dropshipping",
+          "name": "无货源出海电商",
+          "forms": "代发、供应商直发、跨境平台或独立站销售",
+          "aliases": [
+            "无货源",
+            "代发",
+            "一件代发"
+          ],
+          "pack": "P19",
+          "default_overlays": []
+        },
+        {
+          "key": "E03",
+          "slug": "niche_ecom",
+          "name": "细分选品电商",
+          "forms": "面向单一兴趣或职业人群的垂直选品",
+          "aliases": [
+            "选品",
+            "垂直电商"
+          ],
+          "pack": "P19",
+          "default_overlays": []
+        },
+        {
+          "key": "E04",
+          "slug": "preorder_crowdfunding",
+          "name": "预售与众筹",
+          "forms": "先收订单，再生产或采购",
+          "aliases": [
+            "预售",
+            "众筹",
+            "kickstarter"
+          ],
+          "pack": "P20",
+          "default_overlays": []
+        },
+        {
+          "key": "E05",
+          "slug": "pod_custom",
+          "name": "定制与按需生产",
+          "forms": "POD、定制礼品、个性化商品、按单生产",
+          "aliases": [
+            "pod",
+            "定制",
+            "按需生产"
+          ],
+          "pack": "P20",
+          "default_overlays": []
+        },
+        {
+          "key": "E06",
+          "slug": "digital_goods_store",
+          "name": "数字商品商店",
+          "forms": "软件授权、模板、课程、素材、下载内容",
+          "aliases": [
+            "数字商品",
+            "软件授权",
+            "下载商店"
+          ],
+          "pack": "P21",
+          "default_overlays": []
+        },
+        {
+          "key": "E07",
+          "slug": "subscription_box",
+          "name": "订阅盒子与补给服务",
+          "forms": "定期耗材、兴趣盒、宠物、食品或生活用品订阅",
+          "aliases": [
+            "订阅盒",
+            "盲盒",
+            "补给"
+          ],
+          "pack": "P20",
+          "default_overlays": []
+        },
+        {
+          "key": "E08",
+          "slug": "resale_collectible",
+          "name": "二手、收藏与转售",
+          "forms": "二手商品、收藏品、限量商品、跨市场价差交易",
+          "aliases": [
+            "二手",
+            "转售",
+            "收藏",
+            "倒卖"
+          ],
+          "pack": "P19",
+          "default_overlays": []
+        },
+        {
+          "key": "E09",
+          "slug": "affiliate",
+          "name": "联盟营销与导购",
+          "forms": "佣金链接、测评导购、垂直目录、比价和推荐",
+          "aliases": [
+            "affiliate",
+            "佣金",
+            "导购",
+            "返利"
+          ],
+          "pack": "P22",
+          "default_overlays": []
+        },
+        {
+          "key": "E10",
+          "slug": "social_commerce",
+          "name": "社交电商与直播带货",
+          "forms": "内容驱动的商品销售、团购、分销、直播成交",
+          "aliases": [
+            "直播带货",
+            "团购",
+            "分销",
+            "短视频带货"
+          ],
+          "pack": "P23",
+          "default_overlays": []
+        }
+      ]
+    },
+    {
+      "key": "F",
+      "name": "出海与跨境轻资产型",
+      "summary": "把同一套能力卖给海外客户或市场。难点不在交付，而在法域差异、税务、数据跨境和付款冻结。",
+      "modes": [
+        {
+          "key": "F01",
+          "slug": "crossborder_service",
+          "name": "跨境专业服务",
+          "forms": "为海外客户提供设计、开发、营销、咨询和远程交付",
+          "aliases": [
+            "海外客户",
+            "远程接单",
+            "freelance 出海"
+          ],
+          "pack": "P24",
+          "default_overlays": []
+        },
+        {
+          "key": "F02",
+          "slug": "localization",
+          "name": "海外本地化服务",
+          "forms": "翻译、本地化、文化适配、海外客服、市场进入支持",
+          "aliases": [
+            "本地化",
+            "翻译",
+            "出海客服"
+          ],
+          "pack": "P24",
+          "default_overlays": []
+        },
+        {
+          "key": "F03",
+          "slug": "overseas_media",
+          "name": "出海内容与媒体",
+          "forms": "海外垂直账号、资讯、测评、社区、行业媒体",
+          "aliases": [
+            "海外账号",
+            "youtube",
+            "tiktok",
+            "独立媒体"
+          ],
+          "pack": "P10",
+          "default_overlays": []
+        },
+        {
+          "key": "F04",
+          "slug": "overseas_software",
+          "name": "出海软件与数字产品",
+          "forms": "面向海外用户的 SaaS、插件、应用、模板和课程",
+          "aliases": [
+            "出海 saas",
+            "海外应用"
+          ],
+          "pack": "P05",
+          "default_overlays": []
+        },
+        {
+          "key": "F05",
+          "slug": "supply_chain_match",
+          "name": "跨境供应链撮合",
+          "forms": "买家寻找、供应商筛选、验货、采购和项目协调",
+          "aliases": [
+            "供应链",
+            "采购",
+            "验货"
+          ],
+          "pack": "P25",
+          "default_overlays": []
+        },
+        {
+          "key": "F06",
+          "slug": "crossborder_managed",
+          "name": "跨境代运营",
+          "forms": "海外平台、广告、内容、店铺、SEO 和邮件营销",
+          "aliases": [
+            "海外代运营",
+            "跨境代运营"
+          ],
+          "pack": "P02",
+          "default_overlays": []
+        },
+        {
+          "key": "F07",
+          "slug": "overseas_affiliate",
+          "name": "海外联盟与导购",
+          "forms": "面向海外市场的垂直测评、内容和佣金业务",
+          "aliases": [
+            "海外联盟",
+            "测评站"
+          ],
+          "pack": "P22",
+          "default_overlays": []
+        },
+        {
+          "key": "F08",
+          "slug": "remote_edu_consult",
+          "name": "远程教育与咨询",
+          "forms": "语言、职业技能、专业培训和行业辅导",
+          "aliases": [
+            "海外辅导",
+            "远程教学"
+          ],
+          "pack": "P12",
+          "default_overlays": []
+        }
+      ]
+    },
+    {
+      "key": "G",
+      "name": "社群、平台与撮合型",
+      "summary": "经营的是关系和信息差，会员费、活动费或佣金是收入来源。内容质量、隐私和责任边界最容易出问题。",
+      "modes": [
+        {
+          "key": "G01",
+          "slug": "vertical_community",
+          "name": "垂直社群",
+          "forms": "行业、职业、兴趣、城市、校友或创业者社群",
+          "aliases": [
+            "社群",
+            "圈子",
+            "俱乐部"
+          ],
+          "pack": "P26",
+          "default_overlays": []
+        },
+        {
+          "key": "G02",
+          "slug": "matching_platform",
+          "name": "交易撮合平台",
+          "forms": "服务撮合、供应商目录、人才和项目匹配",
+          "aliases": [
+            "撮合",
+            "平台",
+            "目录"
+          ],
+          "pack": "P25",
+          "default_overlays": []
+        },
+        {
+          "key": "G03",
+          "slug": "events_meetup",
+          "name": "活动与小型会议",
+          "forms": "线上分享、线下活动、训练营、行业闭门会",
+          "aliases": [
+            "活动",
+            "线下会",
+            "闭门会",
+            "沙龙"
+          ],
+          "pack": "P26",
+          "default_overlays": []
+        },
+        {
+          "key": "G04",
+          "slug": "intel_subscription",
+          "name": "资源订阅与情报服务",
+          "forms": "招标、招聘、供应商、渠道、政策或机会信息",
+          "aliases": [
+            "情报",
+            "信息差",
+            "招标信息"
+          ],
+          "pack": "P27",
+          "default_overlays": []
+        },
+        {
+          "key": "G05",
+          "slug": "expert_network",
+          "name": "会员制问答与专家网络",
+          "forms": "专家咨询、付费问答、同行互助、办公室答疑",
+          "aliases": [
+            "专家网络",
+            "付费问答",
+            "答疑"
+          ],
+          "pack": "P13",
+          "default_overlays": []
+        },
+        {
+          "key": "G06",
+          "slug": "crowdsourcing_research",
+          "name": "众包与研究服务",
+          "forms": "用户调研、数据标注、体验测试、行业调查",
+          "aliases": [
+            "众包",
+            "调研",
+            "标注",
+            "体验测试"
+          ],
+          "pack": "P28",
+          "default_overlays": []
+        },
+        {
+          "key": "G07",
+          "slug": "community_product",
+          "name": "社区驱动产品",
+          "forms": "开源项目、社区工具、赞助、会员和增值服务",
+          "aliases": [
+            "开源",
+            "社区产品",
+            "赞助"
+          ],
+          "pack": "P06",
+          "default_overlays": []
+        }
+      ]
+    },
+    {
+      "key": "H",
+      "name": "轻资产实体与混合型",
+      "summary": "多条收入线组合在一起。最大的麻烦是归因困难、业务过宽、品牌与交付互相冲突，所以必须先确定第一模式。",
+      "modes": [
+        {
+          "key": "H01",
+          "slug": "content_service",
+          "name": "内容 + 服务",
+          "forms": "账号获客后销售咨询、代运营、培训或项目服务",
+          "aliases": [
+            "获客后接咨询",
+            "内容转服务"
+          ],
+          "pack": "P29",
+          "default_overlays": [
+            "P10"
+          ]
+        },
+        {
+          "key": "H02",
+          "slug": "content_ecom",
+          "name": "内容 + 电商",
+          "forms": "内容种草、联盟营销、自有商品或定制商品",
+          "aliases": [
+            "种草",
+            "内容带货"
+          ],
+          "pack": "P29",
+          "default_overlays": [
+            "P10"
+          ]
+        },
+        {
+          "key": "H03",
+          "slug": "software_service",
+          "name": "软件 + 服务",
+          "forms": "软件订阅结合实施、培训、迁移、顾问和托管",
+          "aliases": [
+            "软件加服务",
+            "实施顾问"
+          ],
+          "pack": "P29",
+          "default_overlays": [
+            "P05"
+          ]
+        },
+        {
+          "key": "H04",
+          "slug": "community_course",
+          "name": "社群 + 课程",
+          "forms": "社群沉淀用户，课程和训练营完成变现",
+          "aliases": [
+            "社群转课程"
+          ],
+          "pack": "P29",
+          "default_overlays": [
+            "P26"
+          ]
+        },
+        {
+          "key": "H05",
+          "slug": "service_digital",
+          "name": "服务 + 数字产品",
+          "forms": "先做项目，再把方法沉淀为模板、课程或工具",
+          "aliases": [
+            "项目转产品",
+            "服务产品化"
+          ],
+          "pack": "P29",
+          "default_overlays": [
+            "P15"
+          ]
+        },
+        {
+          "key": "H06",
+          "slug": "brand_licensing",
+          "name": "个人品牌 + 授权",
+          "forms": "内容影响力结合出版、演讲、品牌合作和 IP 授权",
+          "aliases": [
+            "品牌授权"
+          ],
+          "pack": "P29",
+          "default_overlays": [
+            "P17"
+          ]
+        },
+        {
+          "key": "H07",
+          "slug": "ai_augmented",
+          "name": "AI 增强型个人业务",
+          "forms": "以个人判断和客户信任为核心，AI 提升研究和交付效率",
+          "aliases": [
+            "ai 增强",
+            "ai 提效"
+          ],
+          "pack": "P29",
+          "default_overlays": [],
+          "note": "AI 增强是提效手段，不改变模式归类。请按主要收入来源选择第一模式，再叠加对应指标。"
+        },
+        {
+          "key": "H08",
+          "slug": "multi_income",
+          "name": "多收入组合",
+          "forms": "服务、订阅、广告、联盟、授权和数字产品组合经营",
+          "aliases": [
+            "多条收入",
+            "组合收入"
+          ],
+          "pack": "P29",
+          "default_overlays": [],
+          "note": "多收入组合必须按收入占比选出第一模式，否则无法判断哪个指标才是北极星。"
+        }
+      ]
+    }
+  ],
+  "metric_packs": [
+    {
+      "key": "P01",
+      "slug": "professional_service",
+      "name": "专业服务、顾问、自由职业",
+      "signal": "多个客户签约并回款",
+      "ops": "报价接受率、交付准时率、修改次数、客户满意度",
+      "econ": "单客贡献利润、有效时薪、回款周期、复购/转介绍率",
+      "risk": "范围蔓延、坏账、责任边界、过度依赖个人时间"
+    },
+    {
+      "key": "P02",
+      "slug": "productized_managed",
+      "name": "产品化服务、代运营、托管",
+      "signal": "客户购买标准化套餐并续费",
+      "ops": "交付周期、SOP 覆盖率、工时偏差、客户留存",
+      "econ": "套餐毛利、月度经常性收入、客户流失率",
+      "risk": "服务承诺失控、客户数据、平台授权、结果不可控"
+    },
+    {
+      "key": "P03",
+      "slug": "coaching_training",
+      "name": "教练、培训、陪跑",
+      "signal": "学员付款并完成关键任务",
+      "ops": "到课率、完成率、作业提交率、满意度",
+      "econ": "每位学员贡献利润、续费率、转介绍率",
+      "risk": "夸大效果、资质边界、学员结果不可控"
+    },
+    {
+      "key": "P04",
+      "slug": "recruiting_brokerage",
+      "name": "招聘、撮合、经纪",
+      "signal": "撮合成功并产生佣金",
+      "ops": "合格线索率、匹配率、成交周期、履约率",
+      "econ": "每单佣金、获客成本、退款/纠纷率",
+      "risk": "信息真实性、隐私、佣金争议、平台规则"
+    },
+    {
+      "key": "P05",
+      "slug": "software_product",
+      "name": "独立开发、Micro-SaaS、AI 应用",
+      "signal": "用户完成核心动作并持续使用",
+      "ops": "激活率、留存率、付费转化率、故障率",
+      "econ": "MRR、ARPU、服务器/API 成本、LTV/CAC",
+      "risk": "数据安全、模型错误、平台/API 依赖、技术债"
+    },
+    {
+      "key": "P06",
+      "slug": "devtools_api",
+      "name": "API、开发者工具、插件",
+      "signal": "开发者接入并在真实项目中使用",
+      "ops": "激活、调用量、错误率、文档转化率、留存",
+      "econ": "每调用成本、订阅收入、支持工时、毛利",
+      "risk": "兼容性、供应商变更、滥用、开源许可证"
+    },
+    {
+      "key": "P07",
+      "slug": "data_product",
+      "name": "数据产品、数据库、情报服务",
+      "signal": "客户订阅并将数据用于决策",
+      "ops": "数据更新及时率、准确率、使用频率、续费率",
+      "econ": "每客户数据服务成本、订阅毛利、流失率",
+      "risk": "数据来源、版权、隐私、准确性责任"
+    },
+    {
+      "key": "P08",
+      "slug": "indie_game",
+      "name": "独立游戏、互动产品",
+      "signal": "玩家完成核心体验并回访或付费",
+      "ops": "次日/七日留存、完成率、崩溃率、评价",
+      "econ": "每用户收入、内容更新成本、退款率",
+      "risk": "平台审核、版权、内容合规、上线后维护"
+    },
+    {
+      "key": "P09",
+      "slug": "authorship",
+      "name": "网文、剧本、漫画作者",
+      "signal": "读者持续追读并产生订阅/稿酬/授权",
+      "ops": "更新稳定性、收藏率、追读率、完读率、评论质量",
+      "econ": "每千字收入、单位创作时薪、单作品回收期",
+      "risk": "版权合同、平台依赖、收入周期、创作健康"
+    },
+    {
+      "key": "P10",
+      "slug": "media_account",
+      "name": "新媒体账号、个人品牌",
+      "signal": "目标受众持续关注并产生商业行为",
+      "ops": "完读/观看时长、收藏转发、私信、目标粉丝占比",
+      "econ": "每条内容工时、每千次有效触达收入、商业转化率",
+      "risk": "平台依赖、广告合规、素材版权、流量波动"
+    },
+    {
+      "key": "P11",
+      "slug": "paid_newsletter",
+      "name": "付费通讯、研究报告、专栏",
+      "signal": "读者付费订阅并持续打开和续费",
+      "ops": "打开率、阅读率、点击率、退订率、续费率",
+      "econ": "每订阅者贡献利润、内容生产时薪、收入集中度",
+      "risk": "引用准确性、版权、信息责任、邮件合规"
+    },
+    {
+      "key": "P12",
+      "slug": "course_product",
+      "name": "课程、训练营、知识产品",
+      "signal": "用户付费、完成学习并获得可感知结果",
+      "ops": "注册转化、到课率、完成率、退款率、学员反馈",
+      "econ": "每学员交付成本、续费/升级率、客服工时",
+      "risk": "课程效果表述、版权、个人信息、平台分成"
+    },
+    {
+      "key": "P13",
+      "slug": "membership_community",
+      "name": "会员社群、问答、专家网络",
+      "signal": "会员持续参与并续费",
+      "ops": "活跃率、提问率、回答时效、留存率、内容产出",
+      "econ": "每会员月贡献利润、管理员工时、流失率",
+      "risk": "社群质量、内容责任、骚扰、隐私和退款"
+    },
+    {
+      "key": "P14",
+      "slug": "podcast_video",
+      "name": "播客、音频、视频节目",
+      "signal": "稳定受众增长并完成订阅/赞助/广告",
+      "ops": "完播率、回访率、订阅率、赞助询盘、发布稳定性",
+      "econ": "每期制作工时、每千次有效播放收入、赞助毛利",
+      "risk": "音乐和素材版权、广告披露、平台依赖"
+    },
+    {
+      "key": "P15",
+      "slug": "digital_download",
+      "name": "模板、电子书、资料包、数字下载",
+      "signal": "用户购买、下载并低退款",
+      "ops": "页面转化率、下载成功率、退款率、评价",
+      "econ": "单份边际成本、广告后利润、自然流量占比",
+      "risk": "版权、盗版、内容过时、平台封禁"
+    },
+    {
+      "key": "P16",
+      "slug": "creative_assets",
+      "name": "素材、字体、图标、音频、3D 资产",
+      "signal": "客户购买许可并实际使用",
+      "ops": "授权数量、下载量、复购率、投诉率",
+      "econ": "每资产制作工时、授权收入、维护成本",
+      "risk": "商用许可、模型训练来源、侵权和重复售卖"
+    },
+    {
+      "key": "P17",
+      "slug": "licensing_whitelabel",
+      "name": "授权、白标、IP 资产",
+      "signal": "获得授权费或持续版税",
+      "ops": "授权客户数、授权周期、使用范围、续约率",
+      "econ": "单次授权收入、版税、维权成本",
+      "risk": "权属证明、地域和期限边界、改编争议"
+    },
+    {
+      "key": "P18",
+      "slug": "dtc_store",
+      "name": "独立站 DTC",
+      "signal": "订单完成支付并签收，且售后后仍有利润",
+      "ops": "点击率、转化率、加购率、支付成功率、签收率",
+      "econ": "客单价、广告后贡献利润、退款/拒付率、复购率",
+      "risk": "消费者保护、支付、税务、物流、供应链"
+    },
+    {
+      "key": "P19",
+      "slug": "dropshipping",
+      "name": "无货源出海、代发、跨境选品",
+      "signal": "订单签收且没有严重售后",
+      "ops": "发货及时率、妥投率、客服响应、退款率、拒付率",
+      "econ": "扣除广告/物流/售后后的订单利润",
+      "risk": "产品责任、平台封店、供应商失信、物流和侵权"
+    },
+    {
+      "key": "P20",
+      "slug": "preorder_pod",
+      "name": "预售、众筹、按需生产、POD",
+      "signal": "达到订单门槛并按承诺交付",
+      "ops": "预售转化、交付延期率、缺陷率、退款率",
+      "econ": "预付款现金流、每件贡献利润、生产损耗",
+      "risk": "交付承诺、质量、消费者退款和现金流错配"
+    },
+    {
+      "key": "P21",
+      "slug": "digital_goods_store",
+      "name": "数字商品商店、软件授权",
+      "signal": "购买、激活并低退款",
+      "ops": "页面转化、激活率、支持请求、退款率",
+      "econ": "每份边际成本、渠道费、支持工时",
+      "risk": "授权滥用、盗版、软件兼容、支付风控"
+    },
+    {
+      "key": "P22",
+      "slug": "affiliate_directory",
+      "name": "联盟营销、导购、垂直目录",
+      "signal": "有效点击转化为可结算佣金",
+      "ops": "点击率、转化率、有效订单率、佣金结算周期",
+      "econ": "每有效点击收入、内容工时、平台佣金",
+      "risk": "广告披露、链接归因、平台政策、佣金变化"
+    },
+    {
+      "key": "P23",
+      "slug": "social_commerce",
+      "name": "社交电商、直播带货、分销",
+      "signal": "真实订单签收并产生可结算佣金",
+      "ops": "观看到点击、点击到成交、退货率、直播产能",
+      "econ": "每场直播利润、每小时收入、售后损失",
+      "risk": "虚假宣传、选品质量、平台规则、主播健康"
+    },
+    {
+      "key": "P24",
+      "slug": "crossborder_service",
+      "name": "跨境专业服务、海外本地化",
+      "signal": "海外客户签约、付款并完成交付",
+      "ops": "回复率、销售周期、交付准时率、汇款成功率",
+      "econ": "汇率后有效时薪、获客成本、回款周期",
+      "risk": "合同法域、税务、数据跨境、付款冻结"
+    },
+    {
+      "key": "P25",
+      "slug": "crossborder_supply",
+      "name": "跨境供应链撮合、采购协调",
+      "signal": "买家复购并完成交付",
+      "ops": "询盘合格率、报价转化、交期达成率、纠纷率",
+      "econ": "每项目佣金、协调工时、坏账和差旅",
+      "risk": "产品合规、验货责任、佣金和供应商关系"
+    },
+    {
+      "key": "P26",
+      "slug": "community_events",
+      "name": "垂直社群、活动、闭门会",
+      "signal": "目标成员付费并持续参与",
+      "ops": "报名率、到场率、活跃率、续费率、转介绍",
+      "econ": "每成员贡献利润、活动盈亏、组织工时",
+      "risk": "场地和安全、隐私、内容质量、退款"
+    },
+    {
+      "key": "P27",
+      "slug": "intel_subscription",
+      "name": "资源订阅、机会情报、招标/招聘信息",
+      "signal": "用户因信息产生行动并续订",
+      "ops": "信息新鲜度、命中率、打开率、续费率",
+      "econ": "每订阅者服务成本、订阅毛利、流失率",
+      "risk": "信息准确性、数据来源、隐私、责任边界"
+    },
+    {
+      "key": "P28",
+      "slug": "crowdsourcing_research",
+      "name": "众包、调研、数据标注、体验测试",
+      "signal": "客户重复购买且参与者能稳定交付",
+      "ops": "样本合格率、完成率、返工率、交付周期",
+      "econ": "每项目毛利、参与者成本、客户复购",
+      "risk": "个人信息、样本偏差、劳务和付款合规"
+    },
+    {
+      "key": "P29",
+      "slug": "hybrid_mix",
+      "name": "内容 + 服务、内容 + 电商、软件 + 服务等混合模式",
+      "signal": "内容受众能转化为服务客户、订单或订阅",
+      "ops": "内容到线索转化、线索到成交、交付产能",
+      "econ": "各收入来源贡献利润、渠道依赖、时间分配",
+      "risk": "归因困难、业务过宽、品牌和交付冲突"
+    }
+  ],
+  "mode_to_pack": {
+    "A01": "P01",
+    "A02": "P01",
+    "A03": "P03",
+    "A04": "P01",
+    "A05": "P02",
+    "A06": "P02",
+    "A07": "P01",
+    "A08": "P01",
+    "A09": "P04",
+    "A10": "P01",
+    "B01": "P05",
+    "B02": "P05",
+    "B03": "P05",
+    "B04": "P06",
+    "B05": "P05",
+    "B06": "P07",
+    "B07": "P06",
+    "B08": "P08",
+    "B09": "P06",
+    "C01": "P09",
+    "C02": "P10",
+    "C03": "P11",
+    "C04": "P12",
+    "C05": "P13",
+    "C06": "P11",
+    "C07": "P14",
+    "C08": "P10",
+    "C09": "P16",
+    "C10": "P17",
+    "D01": "P15",
+    "D02": "P15",
+    "D03": "P16",
+    "D04": "P15",
+    "D05": "P16",
+    "D06": "P15",
+    "D07": "P17",
+    "E01": "P18",
+    "E02": "P19",
+    "E03": "P19",
+    "E04": "P20",
+    "E05": "P20",
+    "E06": "P21",
+    "E07": "P20",
+    "E08": "P19",
+    "E09": "P22",
+    "E10": "P23",
+    "F01": "P24",
+    "F02": "P24",
+    "F03": "P10",
+    "F04": "P05",
+    "F05": "P25",
+    "F06": "P02",
+    "F07": "P22",
+    "F08": "P12",
+    "G01": "P26",
+    "G02": "P25",
+    "G03": "P26",
+    "G04": "P27",
+    "G05": "P13",
+    "G06": "P28",
+    "G07": "P06",
+    "H01": "P29",
+    "H02": "P29",
+    "H03": "P29",
+    "H04": "P29",
+    "H05": "P29",
+    "H06": "P29",
+    "H07": "P29",
+    "H08": "P29"
+  },
+  "board_general": [
+    {
+      "key": "acquire",
+      "name": "获客",
+      "metrics": "新增合格潜客、有效触达、访谈、提案"
+    },
+    {
+      "key": "deal",
+      "name": "成交",
+      "metrics": "报价数、定金数、成交率、平均销售周期"
+    },
+    {
+      "key": "delivery",
+      "name": "交付",
+      "metrics": "按时交付率、实际工时、返工率、客户满意度"
+    },
+    {
+      "key": "econ",
+      "name": "经济",
+      "metrics": "收入、直接成本、贡献利润、待收款、现金余额"
+    },
+    {
+      "key": "customer",
+      "name": "客户",
+      "metrics": "复购、转介绍、投诉、退款"
+    },
+    {
+      "key": "personal",
+      "name": "个人",
+      "metrics": "实际投入时长、睡眠和健康、可持续程度"
+    }
+  ],
+  "board_slots": {
+    "north_star": {
+      "count": 1,
+      "label": "北极星指标",
+      "desc": "最能代表客户持续获得价值的指标，例如付费用户留存、签收订单、有效订阅、完成交付或读者追读。"
+    },
+    "process": {
+      "count": 2,
+      "label": "过程指标",
+      "desc": "能解释北极星指标变化的动作，例如有效访谈、激活率、提案接受率、内容发布稳定性或发货及时率。"
+    },
+    "safety": {
+      "count": 2,
+      "label": "安全指标",
+      "desc": "防止表面增长掩盖损失的指标，例如贡献利润、退款率、现金流、投诉率、数据事件或有效时薪。"
+    }
+  },
+  "record_fields": [
+    "我的 OPC 模式",
+    "主要收入来源",
+    "第一层五道闸门当前状态",
+    "北极星指标",
+    "过程指标 1",
+    "过程指标 2",
+    "安全指标 1",
+    "安全指标 2",
+    "本周期目标",
+    "继续、调整或暂停条件",
+    "数据来源和复盘日期"
+  ],
+  "decision_table": [
+    {
+      "key": "continue",
+      "when": "连续两个周期有付款，交付可控，单位经济改善",
+      "decision": "继续，逐步标准化和提高价格"
+    },
+    {
+      "key": "fix_offer",
+      "when": "有访谈和提案，但无付款",
+      "decision": "优先调整客户、痛点、信任证明或 Offer，不急于扩张"
+    },
+    {
+      "key": "shrink",
+      "when": "有付款但长期亏损或严重超时",
+      "decision": "缩小范围、提高价格、改变交付方式或停止该 Offer"
+    },
+    {
+      "key": "reduce_concentration",
+      "when": "只有单一客户贡献大部分收入",
+      "decision": "先降低集中度，再考虑全职投入"
+    },
+    {
+      "key": "downgrade",
+      "when": "健康、家庭、现金流明显恶化",
+      "decision": "立即降级为副业、暂停或退出"
+    },
+    {
+      "key": "recycle",
+      "when": "两轮有记录验证仍无付款证据",
+      "decision": "返回适配复评或切换替代路径"
+    }
+  ],
+  "layer1_min_evidence": [
+    {
+      "gate": 1,
+      "name": "生存与合规",
+      "evidence": "安全垫或稳定现金流、风险清单、资质与平台规则初查"
+    },
+    {
+      "gate": 2,
+      "name": "能力与资源",
+      "evidence": "能力证据、时间安排、工具和供应商方案"
+    },
+    {
+      "gate": 3,
+      "name": "问题与客户",
+      "evidence": "目标客户定义、行为访谈、搜索或内容数据、替代方案"
+    },
+    {
+      "gate": 4,
+      "name": "付款与交付",
+      "evidence": "付款、订单、订阅、签约、稿酬或平台结算记录，以及交付结果"
+    },
+    {
+      "gate": 5,
+      "name": "单位经济与可持续性",
+      "evidence": "毛利或贡献利润、投入工时、留存/复购、现金流和个人耐久力"
+    }
+  ]
+}

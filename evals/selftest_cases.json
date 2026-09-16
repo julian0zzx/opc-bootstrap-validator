@@ -1,0 +1,1791 @@
+{
+  "schema": "opc-bootstrap-validator/1",
+  "engine": "opc-bootstrap-validator",
+  "cases": [
+    {
+      "id": "G1-01",
+      "name": "硬红线命中即锁定（评分不可覆盖）",
+      "kind": "gate1",
+      "config": {
+        "gate1": {
+          "redlines": {
+            "no_cushion_no_income": true,
+            "illegal_acquisition": true
+          },
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": 20000,
+            "max_weeks": 8,
+            "min_result": "2 个付费客户"
+          }
+        }
+      },
+      "expect": {
+        "level": "LOCKED",
+        "redline_count": 2
+      }
+    },
+    {
+      "id": "G1-02",
+      "name": "止损三数字未写全即无法判定",
+      "kind": "gate1",
+      "config": {
+        "gate1": {
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": 20000,
+            "max_weeks": "",
+            "min_result": "2 个付费客户"
+          }
+        }
+      },
+      "expect": {
+        "level": "INCOMPLETE",
+        "stop_loss_missing": [
+          "max_weeks"
+        ]
+      }
+    },
+    {
+      "id": "G1-03",
+      "name": "安全垫月数 = 可动用现金 ÷ 每月最低必要支出",
+      "kind": "gate1",
+      "config": {
+        "gate1": {
+          "safety_cushion": {
+            "cash": 120000,
+            "monthly_essential": 12000,
+            "target_months": 6
+          },
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": 20000,
+            "max_weeks": 8,
+            "min_result": "2 个付费客户"
+          }
+        }
+      },
+      "expect": {
+        "level": "CLEAR",
+        "cushion_months": 10.0,
+        "cushion_ok": true
+      }
+    },
+    {
+      "id": "SC-01",
+      "name": "全部满分但无证据：16 项全部封顶 2 分，总分 40",
+      "kind": "score",
+      "config": {
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 5,
+              "evidence": ""
+            },
+            "tolerate_uncertainty": {
+              "score": 5,
+              "evidence": ""
+            },
+            "long_term_roles": {
+              "score": 5,
+              "evidence": ""
+            },
+            "rejection_resilience": {
+              "score": 5,
+              "evidence": ""
+            },
+            "full_cycle_paid": {
+              "score": 5,
+              "evidence": ""
+            },
+            "sellable_skill": {
+              "score": 5,
+              "evidence": ""
+            },
+            "boundary_judgment": {
+              "score": 5,
+              "evidence": ""
+            },
+            "sales_learning": {
+              "score": 5,
+              "evidence": ""
+            },
+            "cash_cushion": {
+              "score": 5,
+              "evidence": ""
+            },
+            "time_capacity": {
+              "score": 5,
+              "evidence": ""
+            },
+            "compliance_basics": {
+              "score": 5,
+              "evidence": ""
+            },
+            "paid_evidence": {
+              "score": 5,
+              "evidence": ""
+            },
+            "customer_clarity": {
+              "score": 5,
+              "evidence": ""
+            },
+            "reachable_channel": {
+              "score": 5,
+              "evidence": ""
+            },
+            "standardizable": {
+              "score": 5,
+              "evidence": ""
+            },
+            "light_structure": {
+              "score": 5,
+              "evidence": ""
+            }
+          }
+        }
+      },
+      "expect": {
+        "total": 40.0,
+        "capped_count": 16,
+        "missing_count": 0
+      }
+    },
+    {
+      "id": "SC-02",
+      "name": "全部满分且有证据：总分 100，无封顶",
+      "kind": "score",
+      "config": {
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 5,
+              "evidence": "主动选择，非逃避职场"
+            },
+            "tolerate_uncertainty": {
+              "score": 5,
+              "evidence": "连续 6 个月自主推进"
+            },
+            "long_term_roles": {
+              "score": 5,
+              "evidence": "长期承担交付"
+            },
+            "rejection_resilience": {
+              "score": 5,
+              "evidence": "被拒 30 次后调整方案"
+            },
+            "full_cycle_paid": {
+              "score": 5,
+              "evidence": "3 笔回款记录"
+            },
+            "sellable_skill": {
+              "score": 5,
+              "evidence": "作品集 20 个案例"
+            },
+            "boundary_judgment": {
+              "score": 5,
+              "evidence": "不服务清单"
+            },
+            "sales_learning": {
+              "score": 5,
+              "evidence": "报价谈判记录"
+            },
+            "cash_cushion": {
+              "score": 5,
+              "evidence": "10 个月安全垫"
+            },
+            "time_capacity": {
+              "score": 5,
+              "evidence": "每周 20 小时固定时段"
+            },
+            "compliance_basics": {
+              "score": 5,
+              "evidence": "合同模板与风险清单"
+            },
+            "paid_evidence": {
+              "score": 5,
+              "evidence": "2 个付费客户"
+            },
+            "customer_clarity": {
+              "score": 5,
+              "evidence": "客户画像与痛点原话"
+            },
+            "reachable_channel": {
+              "score": 5,
+              "evidence": "渠道回复率记录"
+            },
+            "standardizable": {
+              "score": 5,
+              "evidence": "SOP 与模板"
+            },
+            "light_structure": {
+              "score": 5,
+              "evidence": "无重资产，零外包"
+            }
+          }
+        }
+      },
+      "expect": {
+        "total": 100.0,
+        "capped_count": 0,
+        "missing_count": 0
+      }
+    },
+    {
+      "id": "SC-03",
+      "name": "未评估项按无证据封顶 2 分并单独标记",
+      "kind": "score",
+      "config": {
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 4,
+              "evidence": "原话记录"
+            }
+          }
+        }
+      },
+      "expect": {
+        "missing_count": 15,
+        "capped_count": 15
+      }
+    },
+    {
+      "id": "EC-01",
+      "name": "有收入无工时：拒答，不给数字",
+      "kind": "econ",
+      "config": {
+        "econ": {
+          "target_hourly_rate": 300,
+          "orders": [
+            {
+              "customer": "A",
+              "revenue": 5000,
+              "direct_cost": 500,
+              "hours": null
+            }
+          ]
+        }
+      },
+      "expect": {
+        "level": "INCOMPLETE",
+        "blocking": true
+      }
+    },
+    {
+      "id": "EC-02",
+      "name": "贡献利润为负：判定亏损",
+      "kind": "econ",
+      "config": {
+        "econ": {
+          "target_hourly_rate": 300,
+          "orders": [
+            {
+              "customer": "A",
+              "revenue": 1000,
+              "direct_cost": 500,
+              "hours": 5
+            }
+          ]
+        }
+      },
+      "expect": {
+        "level": "LOSS",
+        "blocking": true,
+        "orders.0.contribution": -1000.0
+      }
+    },
+    {
+      "id": "EC-03",
+      "name": "无交易数据不阻塞，仅标注待回填",
+      "kind": "econ",
+      "config": {
+        "econ": {
+          "target_hourly_rate": 300,
+          "orders": []
+        }
+      },
+      "expect": {
+        "level": "NO_DATA",
+        "blocking": false
+      }
+    },
+    {
+      "id": "AS-01",
+      "name": "软风险命中 3 项：高分也降级为有条件适配",
+      "kind": "assay",
+      "config": {
+        "gate1": {
+          "redlines": {},
+          "soft_risks": [
+            "no_full_cycle",
+            "sales_aversion",
+            "escape_motive"
+          ],
+          "stop_loss": {
+            "max_cash": 20000,
+            "max_weeks": 8,
+            "min_result": "2 个付费客户"
+          }
+        },
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "tolerate_uncertainty": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "long_term_roles": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "rejection_resilience": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "full_cycle_paid": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sellable_skill": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "boundary_judgment": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sales_learning": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "cash_cushion": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "time_capacity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "compliance_basics": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "paid_evidence": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "customer_clarity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "reachable_channel": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "standardizable": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "light_structure": {
+              "score": 5,
+              "evidence": "a"
+            }
+          }
+        }
+      },
+      "expect": {
+        "level": "CONDITIONAL"
+      }
+    },
+    {
+      "id": "AS-02",
+      "name": "硬红线命中：满分也只能锁定为副业测试",
+      "kind": "assay",
+      "config": {
+        "gate1": {
+          "redlines": {
+            "health_family_imbalance": true
+          },
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": 20000,
+            "max_weeks": 8,
+            "min_result": "2 个付费客户"
+          }
+        },
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "tolerate_uncertainty": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "long_term_roles": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "rejection_resilience": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "full_cycle_paid": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sellable_skill": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "boundary_judgment": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sales_learning": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "cash_cushion": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "time_capacity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "compliance_basics": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "paid_evidence": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "customer_clarity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "reachable_channel": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "standardizable": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "light_structure": {
+              "score": 5,
+              "evidence": "a"
+            }
+          }
+        }
+      },
+      "expect": {
+        "level": "LOCKED"
+      }
+    },
+    {
+      "id": "AS-03",
+      "name": "第一层完整（含闸门 3/4）且高分：可进入第二层",
+      "kind": "assay",
+      "config": {
+        "signal_texts": [],
+        "gate1": {
+          "safety_cushion": {
+            "cash": 120000,
+            "monthly_essential": 12000,
+            "target_months": 6
+          },
+          "redlines": {},
+          "soft_risks": [
+            "single_dependency"
+          ],
+          "stop_loss": {
+            "max_cash": 20000,
+            "max_weeks": 8,
+            "min_result": "2 个付费客户"
+          }
+        },
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "tolerate_uncertainty": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "long_term_roles": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "rejection_resilience": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "full_cycle_paid": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sellable_skill": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "boundary_judgment": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "sales_learning": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "cash_cushion": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "time_capacity": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "compliance_basics": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "paid_evidence": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "customer_clarity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "reachable_channel": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "standardizable": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "light_structure": {
+              "score": 5,
+              "evidence": "a"
+            }
+          }
+        },
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ],
+          "funnel": {
+            "targets": 40,
+            "reached": 18,
+            "interviews": 12,
+            "advanced": 4,
+            "proposals": 5,
+            "quotes": 4,
+            "payers": 1,
+            "payments": 1,
+            "deliveries": 1,
+            "results": 1
+          }
+        },
+        "gate4": {
+          "mso": {
+            "target_customer": "跨境小卖家",
+            "scenario": "旺季客服爆量",
+            "pain": "客服重复问题占比高",
+            "loss": "每月浪费 60 小时",
+            "min_result": "7 天内整理出客服知识库与回复模板",
+            "deliverables": "一份知识库文档 + 20 条回复模板",
+            "exclusions": "不含系统对接与持续运营",
+            "client_inputs": "近 3 个月客服聊天记录",
+            "cycle_days": 7,
+            "acceptance": "覆盖 80% 高频问题，模板可直接使用",
+            "price": 8000,
+            "price_terms": "价格 8000 元，首付 50% 定金，交付前付尾款；变更范围需另行报价；延期按天折算；不满足验收标准可申请一次免费返工，仍不达标按比例退款；双方保密；成果归属客户；交付后 7 天内提供售后答疑",
+            "why_me": "3 年跨境客服运营经验",
+            "channel_actions": "知乎每周 2 篇 + 抖音每周 3 条",
+            "direct_cost": "300 元工具费",
+            "delivery_hours": "12 小时",
+            "gross_profit": "约 4400 元",
+            "risks": "客户资料含个人信息，需最小化收集并签署数据处理约定",
+            "stop_loss": "最大投入 2000 元，最长 8 周，最低 2 个付费客户",
+            "goal_90d": "3 个付费客户，单客毛利为正"
+          }
+        }
+      },
+      "expect": {
+        "level": "READY_FOR_LAYER2",
+        "may_enter_layer2": true
+      }
+    },
+    {
+      "id": "AS-04",
+      "name": "闸门 3/4 未评估：即使高分也只能到有条件适配",
+      "kind": "assay",
+      "config": {
+        "gate1": {
+          "safety_cushion": {
+            "cash": 120000,
+            "monthly_essential": 12000,
+            "target_months": 6
+          },
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": 20000,
+            "max_weeks": 8,
+            "min_result": "2 个付费客户"
+          }
+        },
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "tolerate_uncertainty": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "long_term_roles": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "rejection_resilience": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "full_cycle_paid": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sellable_skill": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "boundary_judgment": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sales_learning": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "cash_cushion": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "time_capacity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "compliance_basics": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "paid_evidence": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "customer_clarity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "reachable_channel": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "standardizable": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "light_structure": {
+              "score": 5,
+              "evidence": "a"
+            }
+          }
+        }
+      },
+      "expect": {
+        "level": "CONDITIONAL",
+        "may_enter_layer2": false
+      }
+    },
+    {
+      "id": "DR-01",
+      "name": "方向评分卡：三项硬约束低于 3 分即不合格",
+      "kind": "direct",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 2,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ]
+        }
+      },
+      "expect": {
+        "level": "NO_QUALIFIED",
+        "recommended": null,
+        "directions.0.qualified": false
+      }
+    },
+    {
+      "id": "DR-02",
+      "name": "方向评分卡：加权总分按 100% 权重折算",
+      "kind": "direct",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 5,
+                "reachability": 5,
+                "measurability": 5,
+                "delivery_control": 5,
+                "unit_econ": 5,
+                "repeat_referral": 5,
+                "compliance_dependency": 5,
+                "founder_durability": 5
+              }
+            }
+          ]
+        }
+      },
+      "expect": {
+        "level": "OK",
+        "directions.0.total": 100.0
+      }
+    },
+    {
+      "id": "FN-01",
+      "name": "预验证门槛：无付款时判 NO_PAYMENT",
+      "kind": "funnel",
+      "config": {
+        "funnel": {
+          "targets": 40,
+          "reached": 18,
+          "interviews": 12,
+          "advanced": 4,
+          "payers": 0
+        }
+      },
+      "expect": {
+        "level": "NO_PAYMENT"
+      }
+    },
+    {
+      "id": "FN-02",
+      "name": "预验证门槛：三项齐备判 PASS",
+      "kind": "funnel",
+      "config": {
+        "funnel": {
+          "targets": 40,
+          "reached": 18,
+          "interviews": 12,
+          "advanced": 4,
+          "payers": 1
+        }
+      },
+      "expect": {
+        "level": "PASS"
+      }
+    },
+    {
+      "id": "FN-03",
+      "name": "归因：gate3.loss_reasons 顶层写法被读取（兼容路径）",
+      "kind": "funnel",
+      "config": {
+        "gate3": {
+          "funnel": {
+            "targets": 40,
+            "reached": 18,
+            "interviews": 12,
+            "advanced": 4,
+            "payers": 0
+          },
+          "loss_reasons": {
+            "需求不足": 2,
+            "信任不足": 1
+          }
+        }
+      },
+      "expect": {
+        "level": "NO_PAYMENT",
+        "loss_reasons.需求不足": 2,
+        "loss_reasons.信任不足": 1
+      }
+    },
+    {
+      "id": "FN-04",
+      "name": "归因：gate3.funnel.loss_reasons 规范写法被读取",
+      "kind": "funnel",
+      "config": {
+        "gate3": {
+          "funnel": {
+            "targets": 40,
+            "reached": 18,
+            "interviews": 12,
+            "advanced": 4,
+            "payers": 0,
+            "loss_reasons": {
+              "价格不足": 3
+            }
+          }
+        }
+      },
+      "expect": {
+        "level": "NO_PAYMENT",
+        "loss_reasons.价格不足": 3
+      }
+    },
+    {
+      "id": "FN-05",
+      "name": "归因：顶层 loss_reasons 写法被读取（兼容路径）",
+      "kind": "funnel",
+      "config": {
+        "funnel": {
+          "targets": 40,
+          "reached": 18,
+          "interviews": 12,
+          "advanced": 4,
+          "payers": 0
+        },
+        "loss_reasons": {
+          "交付不明确": 4
+        }
+      },
+      "expect": {
+        "level": "NO_PAYMENT",
+        "loss_reasons.交付不明确": 4
+      }
+    },
+    {
+      "id": "MS-01",
+      "name": "MSO：免费方案不得通过（第 4 条必须收费）",
+      "kind": "mso",
+      "config": {
+        "mso": {
+          "target_customer": "跨境小卖家",
+          "pain": "客服重复",
+          "min_result": "知识库",
+          "deliverables": "文档",
+          "client_inputs": "聊天记录",
+          "acceptance": "覆盖 80%",
+          "exclusions": "不含对接",
+          "cycle_days": 7,
+          "price": 0,
+          "delivery_hours": "12 小时",
+          "why_me": "经验",
+          "scenario": "旺季",
+          "loss": "浪费工时",
+          "price_terms": "定金 变更 延期 退款 保密 成果归属 售后",
+          "channel_actions": "知乎",
+          "direct_cost": "300",
+          "gross_profit": "4400",
+          "risks": "个人信息",
+          "stop_loss": "2000",
+          "goal_90d": "3 客户"
+        }
+      },
+      "expect": {
+        "level": "NOT_READY",
+        "standards.3.pass": false
+      }
+    },
+    {
+      "id": "MS-02",
+      "name": "MSO：保证类表述直接判不通过",
+      "kind": "mso",
+      "config": {
+        "mso": {
+          "target_customer": "跨境小卖家",
+          "pain": "客服重复",
+          "min_result": "知识库",
+          "deliverables": "文档",
+          "client_inputs": "聊天记录",
+          "acceptance": "覆盖 80%",
+          "exclusions": "不含对接",
+          "cycle_days": 7,
+          "price": 8000,
+          "delivery_hours": "12 小时",
+          "why_me": "保证增长 30%",
+          "scenario": "旺季",
+          "loss": "浪费工时",
+          "price_terms": "定金 变更 延期 退款 保密 成果归属 售后",
+          "channel_actions": "知乎",
+          "direct_cost": "300",
+          "gross_profit": "4400",
+          "risks": "个人信息",
+          "stop_loss": "2000",
+          "goal_90d": "3 客户"
+        }
+      },
+      "expect": {
+        "level": "NOT_READY",
+        "standards.5.pass": false
+      }
+    },
+    {
+      "id": "ST-01",
+      "name": "止损监控：现金超限判 PAUSE",
+      "kind": "stop",
+      "config": {
+        "tracking": {
+          "cash_spent": 3000,
+          "cash_limit": 2000,
+          "weeks_elapsed": 3,
+          "weeks_limit": 8,
+          "rounds": [
+            {
+              "round": 1,
+              "changed_vars": [
+                "价格"
+              ],
+              "payments": 0
+            }
+          ]
+        }
+      },
+      "expect": {
+        "verdict": "PAUSE"
+      }
+    },
+    {
+      "id": "ST-02",
+      "name": "止损监控：两轮无付款判 EXIT",
+      "kind": "stop",
+      "config": {
+        "tracking": {
+          "cash_spent": 500,
+          "cash_limit": 2000,
+          "weeks_elapsed": 5,
+          "weeks_limit": 8,
+          "rounds": [
+            {
+              "round": 1,
+              "changed_vars": [
+                "价格"
+              ],
+              "payments": 0
+            },
+            {
+              "round": 2,
+              "changed_vars": [
+                "人群"
+              ],
+              "payments": 0
+            }
+          ]
+        }
+      },
+      "expect": {
+        "verdict": "EXIT",
+        "rounds_used": 2
+      }
+    },
+    {
+      "id": "ST-03",
+      "name": "止损监控：命中任意两项建议停止条件即 STOP",
+      "kind": "stop",
+      "config": {
+        "tracking": {
+          "cash_spent": 500,
+          "cash_limit": 2000,
+          "weeks_elapsed": 5,
+          "weeks_limit": 8,
+          "rounds": [
+            {
+              "round": 1,
+              "changed_vars": [
+                "价格"
+              ],
+              "payments": 1
+            }
+          ],
+          "suggest": {
+            "imagined_feedback": true,
+            "escape_only": true
+          }
+        }
+      },
+      "expect": {
+        "verdict": "STOP",
+        "suggest_hits": 2
+      }
+    },
+    {
+      "id": "ST-04",
+      "name": "止损监控：立即停止条件命中即 EXIT_NOW",
+      "kind": "stop",
+      "config": {
+        "tracking": {
+          "cash_spent": 100,
+          "cash_limit": 2000,
+          "weeks_elapsed": 1,
+          "weeks_limit": 8,
+          "rounds": [],
+          "immediate": {
+            "health_family_decline": true
+          }
+        }
+      },
+      "expect": {
+        "verdict": "EXIT_NOW",
+        "immediate_hits": 1
+      }
+    },
+    {
+      "id": "SG-01",
+      "name": "伪验证信号拦截：粉丝增长不算已验证",
+      "kind": "signal",
+      "text": "我的公众号粉丝已经 3000 了，说明方向没问题",
+      "expect": {
+        "level": "BLOCKED",
+        "hit_count": 1,
+        "hits.0.key": "followers"
+      }
+    },
+    {
+      "id": "SG-02",
+      "name": "无伪验证表述时不拦截",
+      "kind": "signal",
+      "text": "上个月有 2 个客户付了全款，交付用了 30 小时",
+      "expect": {
+        "level": "CLEAR",
+        "hit_count": 0
+      }
+    },
+    {
+      "id": "SG-03",
+      "name": "信号分级：识别到强验证（付款）",
+      "kind": "signal",
+      "text": "上个月有 2 个客户付了全款，交付用了 30 小时",
+      "expect": {
+        "strongest_signal_level": 3,
+        "strongest_is_strong": true
+      }
+    },
+    {
+      "id": "RC-01",
+      "name": "报告渲染：对外交付默认脱敏，不泄露金额与姓名",
+      "kind": "report",
+      "config": {
+        "user": {
+          "name": "张三",
+          "date": "2026-09-15",
+          "audience": "external"
+        },
+        "gate1": {
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": "不超过可支配现金的 5%",
+            "max_weeks": "8 周",
+            "min_result": "2 个付费客户"
+          }
+        },
+        "score": {
+          "items": {
+            "paid_evidence": {
+              "score": 4,
+              "evidence": "2 笔回款"
+            }
+          }
+        },
+        "econ": {
+          "target_hourly_rate": 300,
+          "orders": [
+            {
+              "customer": "客户A",
+              "revenue": 18000,
+              "direct_cost": 2200,
+              "hours": 46
+            }
+          ],
+          "cac": 1500,
+          "monthly_contribution_per_customer": 4200
+        }
+      },
+      "expect_html": [
+        "<!DOCTYPE html>",
+        "OPC 启动验证器",
+        "已脱敏",
+        "免责与使用边界",
+        "扩大投入闸门",
+        "订单 1"
+      ],
+      "reject_html": [
+        "张三",
+        "18000",
+        "2200",
+        "客户A",
+        "references/方法论全文.md",
+        "opc-bootstrap-validator-state.json"
+      ]
+    },
+    {
+      "id": "RC-02",
+      "name": "报告渲染：自用版保留绝对值与判据出处",
+      "kind": "report",
+      "mask": false,
+      "config": {
+        "user": {
+          "name": "张三",
+          "date": "2026-09-15",
+          "audience": "internal"
+        },
+        "gate1": {
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": "不超过可支配现金的 5%",
+            "max_weeks": "8 周",
+            "min_result": "2 个付费客户"
+          }
+        },
+        "score": {
+          "items": {
+            "paid_evidence": {
+              "score": 4,
+              "evidence": "2 笔回款"
+            }
+          }
+        },
+        "econ": {
+          "target_hourly_rate": 300,
+          "orders": [
+            {
+              "customer": "客户A",
+              "revenue": 18000,
+              "direct_cost": 2200,
+              "hours": 46
+            }
+          ],
+          "cac": 1500,
+          "monthly_contribution_per_customer": 4200
+        }
+      },
+      "expect_html": [
+        "张三",
+        "18000",
+        "references/方法论全文.md",
+        "自用版"
+      ]
+    },
+    {
+      "id": "RC-03",
+      "name": "报告渲染：闸门 3/4 与止损章节齐全（10 节编号连续）",
+      "kind": "report",
+      "mask": true,
+      "config": {
+        "user": {
+          "name": "李四",
+          "date": "2026-09-15",
+          "audience": "external"
+        },
+        "signal_texts": [
+          "我的产品已经上线了，粉丝涨到 3000"
+        ],
+        "gate1": {
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": "2000 元",
+            "max_weeks": "8 周",
+            "min_result": "2 个付费客户"
+          }
+        },
+        "score": {
+          "items": {
+            "motive_choice": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "tolerate_uncertainty": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "long_term_roles": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "rejection_resilience": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "full_cycle_paid": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "sellable_skill": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "boundary_judgment": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "sales_learning": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "cash_cushion": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "time_capacity": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "compliance_basics": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "paid_evidence": {
+              "score": 5,
+              "evidence": "2 笔回款"
+            },
+            "customer_clarity": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "reachable_channel": {
+              "score": 4,
+              "evidence": "a"
+            },
+            "standardizable": {
+              "score": 5,
+              "evidence": "a"
+            },
+            "light_structure": {
+              "score": 5,
+              "evidence": "a"
+            }
+          }
+        },
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ],
+          "funnel": {
+            "targets": 40,
+            "reached": 18,
+            "interviews": 12,
+            "advanced": 4,
+            "payers": 0
+          }
+        },
+        "gate4": {
+          "mso": {
+            "target_customer": "跨境小卖家",
+            "pain": "客服重复"
+          }
+        },
+        "tracking": {
+          "cash_spent": 500,
+          "cash_limit": 2000,
+          "weeks_elapsed": 3,
+          "weeks_limit": 8,
+          "rounds": [
+            {
+              "round": 1,
+              "changed_vars": [
+                "价格"
+              ],
+              "payments": 0
+            }
+          ]
+        },
+        "layer2": {
+          "revenue_source": "客户按项目一次性付款，固定范围、固定周期、固定价格的服务包",
+          "risk_source": "范围蔓延、回款周期长、过度依赖个人时间",
+          "slots": {
+            "north_star": "客户续费或复购的套餐数",
+            "process": [
+              "每周发出的个性化提案数",
+              "提案到定金的接受率"
+            ],
+            "safety": [
+              "套餐毛利",
+              "回款周期（天）"
+            ]
+          },
+          "concentration": 0.62
+        }
+      },
+      "expect_html": [
+        "闸门 3 · 问题与客户",
+        "闸门 4 · 付费与交付",
+        "止损与退出监控",
+        "信号强度分级",
+        "产品上线",
+        "粉丝增长",
+        "需要关注的缺口",
+        "被压制的档位",
+        "评分锚定",
+        "替代路径",
+        "第二层 · 模式与专属指标",
+        "第二层 · 合并看板",
+        "产品化服务",
+        "五槽位",
+        "每周经营看板",
+        "继续 / 调整 / 暂停",
+        "记录格式",
+        "第一层未通过"
+      ],
+      "reject_html": [
+        "李四"
+      ]
+    },
+    {
+      "id": "MD-01",
+      "name": "顺序闸门：没有合格候选方向时拒绝归类",
+      "kind": "modes",
+      "config": {
+        "gate1": {
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": 2000,
+            "max_weeks": 8,
+            "min_result": "x"
+          }
+        }
+      },
+      "expect": {
+        "level": "BLOCKED_ORDER",
+        "ok": false
+      }
+    },
+    {
+      "id": "MD-02",
+      "name": "防误判：只有方向描述时必须回问收入来源，不得硬套模式",
+      "kind": "modes",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ]
+        },
+        "layer2": {
+          "direction": "帮跨境小卖家 7 天整理客服知识库与回复模板"
+        }
+      },
+      "expect": {
+        "level": "NEEDS_INPUT",
+        "ok": false,
+        "confidence": "none"
+      }
+    },
+    {
+      "id": "MD-03",
+      "name": "补上主要收入来源后归到产品化服务 → 指标包 P02",
+      "kind": "modes",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ]
+        },
+        "layer2": {
+          "direction": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+          "revenue_source": "客户按项目一次性付款，固定范围、固定周期、固定价格的服务包",
+          "risk_source": "范围蔓延、回款周期长"
+        }
+      },
+      "expect": {
+        "level": "RESOLVED",
+        "ok": true,
+        "confidence": "high",
+        "mode.key": "A05",
+        "pack.key": "P02",
+        "category.key": "A"
+      }
+    },
+    {
+      "id": "MD-04",
+      "name": "显式 mode_key 直接命中，跳过关键词匹配",
+      "kind": "modes",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ]
+        },
+        "layer2": {
+          "mode_key": "B03"
+        }
+      },
+      "expect": {
+        "level": "RESOLVED",
+        "matched_by": "explicit",
+        "mode.key": "B03",
+        "pack.key": "P05"
+      }
+    },
+    {
+      "id": "MD-05",
+      "name": "混合型：第一模式取混合包 P29，并带出默认叠加包",
+      "kind": "modes",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ]
+        },
+        "layer2": {
+          "mode_key": "H05"
+        }
+      },
+      "expect": {
+        "level": "RESOLVED",
+        "mode.key": "H05",
+        "pack.key": "P29",
+        "overlays.0.key": "P15"
+      }
+    },
+    {
+      "id": "MD-06",
+      "name": "模式库完整性：8 类 / 69 模式 / 29 指标包，无孤儿模式",
+      "kind": "modes_meta",
+      "expect": {
+        "categories": 8,
+        "modes": 69,
+        "packs": 29,
+        "mode_to_pack": 69,
+        "orphan_modes": 0,
+        "general_board_categories": 6,
+        "record_fields": 11,
+        "decision_rules": 6
+      }
+    },
+    {
+      "id": "BD-01",
+      "name": "第一层未放行时明示 gated；模式未归类也不崩",
+      "kind": "board",
+      "config": {
+        "gate1": {
+          "redlines": {},
+          "soft_risks": [],
+          "stop_loss": {
+            "max_cash": 2000,
+            "max_weeks": 8,
+            "min_result": "x"
+          }
+        }
+      },
+      "expect": {
+        "gated": true,
+        "layer1.level": "INCOMPLETE",
+        "mode_unresolved": true,
+        "decision.key": "fix_offer",
+        "record_complete": false
+      }
+    },
+    {
+      "id": "BD-02",
+      "name": "五槽位缺项报待填并给候选池；9.2 命中「先改 Offer」",
+      "kind": "board",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ],
+          "funnel": {
+            "targets": 40,
+            "reached": 18,
+            "interviews": 12,
+            "advanced": 4,
+            "payers": 0
+          }
+        },
+        "layer2": {
+          "revenue_source": "客户按项目一次性付款，固定范围、固定周期、固定价格的服务包",
+          "slots": {
+            "north_star": "客户续费或复购的套餐数",
+            "process": [
+              "每周提案数"
+            ],
+            "safety": [
+              "套餐毛利",
+              "回款周期"
+            ]
+          }
+        }
+      },
+      "expect": {
+        "slots_complete": false,
+        "slots.0.ok": true,
+        "slots.1.ok": false,
+        "slots.1.required": 2,
+        "slots.1.pool.0": "交付周期",
+        "mode.key": "A05",
+        "decision.key": "fix_offer"
+      }
+    },
+    {
+      "id": "BD-03",
+      "name": "记录格式：模式/收入来源/第一层状态/五槽位自动回填",
+      "kind": "board",
+      "config": {
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ],
+          "funnel": {
+            "targets": 40,
+            "reached": 18,
+            "interviews": 12,
+            "advanced": 4,
+            "payers": 0
+          }
+        },
+        "layer2": {
+          "revenue_source": "客户按项目一次性付款，固定范围、固定周期、固定价格的服务包",
+          "slots": {
+            "north_star": "客户续费或复购的套餐数",
+            "process": [
+              "每周提案数",
+              "提案接受率"
+            ],
+            "safety": [
+              "套餐毛利",
+              "回款周期"
+            ]
+          }
+        }
+      },
+      "expect": {
+        "record.0.value": "产品化服务",
+        "record.0.auto": true,
+        "record.3.value": "客户续费或复购的套餐数",
+        "record.3.auto": true,
+        "record.7.value": "回款周期",
+        "record.7.auto": true,
+        "slots_complete": true
+      }
+    },
+    {
+      "id": "BD-04",
+      "name": "看板 HTML：独立成文、脱敏、含五槽位与决策块",
+      "kind": "board_html",
+      "config": {
+        "user": {
+          "name": "王五",
+          "date": "2026-09-15",
+          "audience": "external"
+        },
+        "gate3": {
+          "directions": [
+            {
+              "name": "帮跨境小卖家 7 天整理客服知识库与回复模板",
+              "basis": "past_results",
+              "scores": {
+                "pain_intensity": 5,
+                "paid_proof": 4,
+                "reachability": 4,
+                "measurability": 4,
+                "delivery_control": 4,
+                "unit_econ": 4,
+                "repeat_referral": 3,
+                "compliance_dependency": 4,
+                "founder_durability": 5
+              }
+            }
+          ],
+          "funnel": {
+            "targets": 40,
+            "reached": 18,
+            "interviews": 12,
+            "advanced": 4,
+            "payers": 0
+          }
+        },
+        "layer2": {
+          "revenue_source": "客户按项目一次性付款，固定范围、固定周期、固定价格的服务包",
+          "slots": {
+            "north_star": "客户续费或复购的套餐数",
+            "process": [
+              "每周提案数",
+              "提案接受率"
+            ],
+            "safety": [
+              "套餐毛利",
+              "回款周期"
+            ]
+          }
+        }
+      },
+      "expect_html": [
+        "<!DOCTYPE html>",
+        "OPC 第二层合并看板",
+        "已脱敏",
+        "五槽位",
+        "每周经营看板",
+        "继续 / 调整 / 暂停",
+        "记录格式",
+        "产品化服务"
+      ],
+      "reject_html": [
+        "王五"
+      ]
+    },
+    {
+      "id": "DC-01",
+      "name": "全库版本一致性：gate.py / frontmatter / 正文 / README / references 三份标记",
+      "kind": "docs_meta",
+      "expect": {
+        "sources": 7,
+        "stale": []
+      }
+    },
+    {
+      "id": "FM-01",
+      "name": "SKILL.md frontmatter 结构合法（无折行破坏 / 必需字段齐全 / 无废弃字段）",
+      "kind": "frontmatter",
+      "expect": {
+        "fields": 9,
+        "problems": []
+      }
+    }
+  ]
+}
