@@ -22,7 +22,7 @@ import os
 import re
 import sys
 
-VERSION = "0.6.0"
+VERSION = "0.6.1"
 ENGINE = "opc-bootstrap-validator"
 SCHEMA = "opc-bootstrap-validator/1"
 
@@ -2559,6 +2559,28 @@ def run_selftest(cases_path=None):
 
             stale = ["%s（%s）" % (lbl, v) for lbl, v in claims if v != VERSION]
             got = {"sources": len(claims), "stale": stale, "version": VERSION}
+        elif kind == "docs_pacing":
+            root = os.path.normpath(os.path.join(here, os.pardir))
+            missing, total = [], 0
+            groups = (("SKILL.md", c.get("skill_rules") or []),
+                      (os.path.join("references", "提问脚本.md"), c.get("script_rules") or []))
+            for rel, rules in groups:
+                fp = os.path.join(root, rel)
+                try:
+                    with open(fp, encoding="utf-8") as fh:
+                        t = fh.read()
+                except IOError:
+                    t = ""
+                if not t:
+                    missing.append("%s（文件缺失）" % rel)
+                for rule in rules:
+                    total += 1
+                    if rule not in t:
+                        missing.append("%s 缺少 %r" % (rel, rule))
+            got = {"rules": total,
+                   "skill_rules": len(c.get("skill_rules") or []),
+                   "script_rules": len(c.get("script_rules") or []),
+                   "missing": missing}
         elif kind == "frontmatter":
             fp = os.path.join(here, os.pardir, "SKILL.md")
             with open(fp, encoding="utf-8") as fh:

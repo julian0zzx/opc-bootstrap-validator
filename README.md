@@ -2,7 +2,7 @@
 
 把《方法论全文（OPC 单人创业自查与最小验证流程）》的表格判据固化为确定性计算，产出中性的 HTML 决策书。
 
-- 当前版本：**v0.6.0**（两层闸门全部实现）
+- 当前版本：**v0.6.1**（两层闸门全部实现）
 - 引擎：`scripts/gate.py`（Python 标准库零依赖）
 - 命名：skill 标识 `opc-bootstrap-validator`，中文显示名「OPC 启动验证器」
 - 报告名《OPC 最小验证决策书》。
@@ -57,7 +57,7 @@ opc-bootstrap-validator/
 │   ├── 第二层模式与看板.md            8 类模式索引 + 29 指标包 + 五槽位用法 + 定模式规则 + 边界
 │   └── 提问脚本.md                   八步逐题问法与追问分支（含闸门 3/4 与第二层）
 ├── evals/
-│   ├── selftest_cases.json         44 项回归用例（含 4 项 HTML 渲染 + 1 项版本一致性 + 1 项 frontmatter 结构）
+│   ├── selftest_cases.json         45 项回归用例（含 4 项 HTML 渲染 + 1 项版本一致性 + 1 项 frontmatter 结构 + 1 项提问节奏约束）
 │   └── demo_input.json             完整示例输入（含 layer2）
 └── README.md
 ```
