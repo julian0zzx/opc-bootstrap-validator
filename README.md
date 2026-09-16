@@ -4,16 +4,14 @@
 
 - 当前版本：**v0.6.0**（两层闸门全部实现）
 - 引擎：`scripts/gate.py`（Python 标准库零依赖）
-- 安装位置：`~/.workbuddy/skills/opc-bootstrap-validator/`
-- 命名：skill 标识 `opc-bootstrap-validator`，中文显示名「OPC 启动验证器」（中英语义对齐：bootstrap = 启动，validator = 验证器）
-- 历史名：曾用 `opc-validation-gate` / 「OPC 最小验证闸门」，对外发布前统一改为现名，无迁移成本
-- 产物名不跟随改名：报告仍叫《OPC 最小验证决策书》。「最小验证」是方法论文档《OPC 单人创业自查与最小验证流程》的核心术语，不随 skill 显示名变化
+- 命名：skill 标识 `opc-bootstrap-validator`，中文显示名「OPC 启动验证器」
+- 报告名《OPC 最小验证决策书》。
 
 ## 自足性与职责边界
 
 本 skill 完全自足，不依赖任何其他 skill。输入全部由自己提问收集，不读取、不修改外部产物，也不假设环境里存在任何"定方向"类的工具。
 
-职责上它只回答一个问题：这个方向能不能开始、还差哪些证据。它不负责替你选方向：方向的产生被设计成闸门 3 内部的第一个动作（第四章四类证据 → 3–5 个候选），不从外部输入。候选方向只能从当事人已发生的事实里来，不能拿一份模式目录或赛道清单倒推（见文末 P1 的顺序约束）。
+职责上它只回答一个问题：这个方向能不能开始、还差哪些证据。它不负责替你选方向：方向的产生被设计成闸门 3 内部的第一个动作（第四章四类证据 → 3–5 个候选），不从外部输入。
 
 ## 两层闸门
 
@@ -44,21 +42,6 @@
 - 没有合格候选方向就跑 `modes` → `BLOCKED_ORDER`，退出码 4；
 - 只给方向名、没给主要收入来源 → `NEEDS_INPUT`，回问「你的钱主要从哪来」，**不硬套一个模式**。
 
-## 快速开始
-
-```bash
-cd ~/.workbuddy/skills/opc-bootstrap-validator
-
-python3 scripts/gate.py selftest                       # 44 项判据回归自检（含 HTML 渲染断言、文档版本与 frontmatter 校验）
-python3 scripts/gate.py template --out opc_input.json  # 生成输入模板
-python3 scripts/gate.py assay  --config opc_input.json
-python3 scripts/gate.py modes  --config opc_input.json                    # 第二层：模式归类
-python3 scripts/gate.py board  --config opc_input.json --out 第二层看板.html  # 第二层：合并看板
-python3 scripts/gate.py report --config opc_input.json --out OPC决策书.html --sync-state
-```
-
-`evals/demo_input.json` 是一份完整示例（覆盖两层闸门，结论：`CONDITIONAL`，适配度 80.8/100 —— 分数过线但因"尚无真实付款证据"被压制；第二层归到 `A05 产品化服务` → 指标包 `P02`）。
-
 ## 目录
 
 ```
@@ -78,49 +61,3 @@ opc-bootstrap-validator/
 │   └── demo_input.json             完整示例输入（含 layer2）
 └── README.md
 ```
-
-## 版本一致性与 frontmatter 校验
-
-引擎版本声明分布在 **5 类来源**，`selftest` 会全部核对（用例 `DC-01`）：
-
-| 来源 | 形式 |
-|---|---|
-| `scripts/gate.py` | `VERSION = "x.y.z"` ← **唯一事实源** |
-| `SKILL.md` frontmatter | `version: x.y.z` |
-| `SKILL.md` 正文 | `当前版本 vx.y.z：两层闸门全部实现。` |
-| `README.md` | `当前版本：**vx.y.z**` |
-| `references/` ×3 | `> **随引擎 vx.y.z 更新** · 日期` |
-
-任一处脱节，自检会直接失败并指出是哪里、标成了哪一版。升版本的标准动作：改 `gate.py` 的 `VERSION`，同步其余 4 类，再跑 `selftest`。
-
-用例 `FM-01` 另校验 `SKILL.md` frontmatter 结构：必需字段齐全（`name` / `description` / `version` / `agent_created`）、不含已废弃字段、且没有折行破坏 YAML（多行值必须缩进，否则整个 frontmatter 解析失败）。该校验用纯正则实现，引擎保持标准库零依赖。
-
-`references/` 下三份随引擎演进的文档（`证据分级与锚定表.md` / `第二层模式与看板.md` / `提问脚本.md`）带版本标记；
-`方法论全文.md` 是原文档全文收录、不随引擎变化，不带版本标记。
-
-## 四条不可违反的设计原则
-
-1. **判据先于评分**：6 条硬红线命中即锁定，任何评分不得覆盖。
-2. **无证据不加分**：无事实记录的打分由代码封顶 2 分。
-3. **不做鼓励性表达**：最高档结论是"可进入第二层自查"，离"可以去辞职"还差得远。
-4. **模式目录不反用于选题**：先有候选方向，才有模式归类；没方向时 `modes` 直接拒绝。
-
-## 状态档案
-
-`opc-bootstrap-state.json` 默认落在**当前工作目录**，而不是 skill 安装目录（可用输入的 `state.path` 指定绝对路径）。skill 目录本身不应出现状态文件——看到它说明有人把 cwd 切到了 skill 里跑命令。
-
-只做读写与闸门放行判断，不做任何定时、提醒或后台任务。阶段流转：
-`inited → layer1_gate1 → layer1_score → layer1_econ → layer1_done → layer2_modes → layer2_metrics → layer2_board`
-
-## 报告脱敏
-
-`report` 默认按 `user.audience` 判定：`external`（或未填）→ **脱敏**，隐藏姓名与一切现金绝对值，只留比例指标（贡献利润率、有效时薪是否达标、回本周期月数）；`internal` 才保留绝对值与判据出处。可用 `--mask` / `--no-mask` 强制覆盖。报告分 10 节（输入含 `layer2` 时追加两节、共 12 节），编号连续。
-
-## 退出码
-
-`0` 成功 · `1` 自检有失败用例 · `2` 输入错误 · `4` 第二层被顺序闸门拒绝（没有合格候选方向）。
-
-## 已知取舍
-
-- 归类靠关键词，不靠猜。关键词权重 = 词长 × IDF，压制「模板」「咨询」这类通用词；只有完整模式名或 slug 出现才给整名加分。即便如此，没给收入来源时也不自动归类，而是回问：宁可多问一句，别锁错一套指标。
-- 看板不阻止你在第一层没过时看它，但会在顶部明示「不构成扩大投入依据」并回显第一层缺口。理由是方法论自己的记录格式里就有「第一层五道闸门当前状态」这一项，说明看板本就该在第一层进行中使用。
