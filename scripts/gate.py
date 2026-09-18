@@ -20,15 +20,36 @@ import json
 import math
 import os
 import re
+import shutil
 import sys
 
-VERSION = "0.6.1"
+VERSION = "0.8.1"
 ENGINE = "opc-bootstrap-validator"
 SCHEMA = "opc-bootstrap-validator/1"
 
 # ══════════════════════════════════════════════════════════════════
 # 判据常量（出处见 references/方法论全文.md，章节号对应 SKILL.md 对照表）
 # ══════════════════════════════════════════════════════════════════
+
+# ══════════════════════════════════════════════════════════════════
+# 第 0 层 · 当事人盘点（开场后 1 轮，不评分、不否决、不封顶）
+# ══════════════════════════════════════════════════════════════════
+# 用途只有三处：① 闸门 3 生成候选方向的输入；② 闸门 2 提问时的锚定；
+# ③ 报告执行摘要回显。当事人自述的禀赋**不构成任何评分项的证据**。
+
+PROFILE_FIELDS = [
+    ("weekly_hours", "每周可稳定投入的小时数", "闸门 2「每周可稳定投入时间」的证据；判断 14 天交付可行性"),
+    ("time_window", "可投入的时段", "判断是否需要与主业、照护责任错峰"),
+    ("existing_assets", "手上已经能直接用的东西", "闸门 2「可对外售卖的专业能力」「可重复触达渠道」的线索"),
+    ("constraints", "未来 12 个月的硬约束", "闸门 1 红线 4/5：健康、照护、体力、地域、语言、实名与露脸"),
+    ("exclusions", "明确不愿做的事", "方向生成时排除，避免生成当事人心理上排斥的方向"),
+    ("delivery_form", "更想交付的形态", "方向生成的输入；也是验证路径的初判线索"),
+]
+
+DELIVERY_FORMS = ["服务", "内容", "产品", "实物", "混合"]
+
+PROFILE_RULE = ("第 0 层不评分、不否决、不封顶。当事人自述的禀赋只用于生成候选方向与锚定提问，"
+                "不能顶替闸门 2 的证据——每一项仍要有自己的案例、记录、回款或结算凭证。")
 
 # 硬红线 · 第二章 2.1
 HARD_REDLINES = [
@@ -165,6 +186,110 @@ ABSOLUTE_CLAIMS = ["保证", "确保", "一定能", "必然", "100%", "零风险
 
 # 书面约定项 · 第六章 6.2 第 7 条
 CONTRACT_TERMS = ["定金", "变更", "延期", "退款", "保密", "成果归属", "售后"]
+
+# ══════════════════════════════════════════════════════════════════
+# 验证路径（track）· 在候选方向产出之后判定（第十二章 12.1、12.1.1）
+# ══════════════════════════════════════════════════════════════════
+# 只决定**证据的载体**，不决定选题，也不放松任何阈值。
+# 判定依据是「客户数 × 客单价 × 分发方式」这组交易特征，不是模式目录——
+# 顺序仍写死为：先由四类证据生成方向，再判路径（合规红线 9）。
+
+TRACKS = [
+    ("T1", "销售驱动", "单客户或少数客户，客单价较高，需要提案与谈判",
+     ["代运营", "托管", "顾问", "咨询", "陪跑", "教练", "审计", "评估",
+      "经纪", "撮合", "定制开发", "外包", "驻场", "上门", "线下服务",
+      "虚拟助理", "远程运营", "小型工作室", "微型代理", "采购", "供应链", "批发"]),
+    ("T2", "分发驱动",
+     "面向大量匿名受众，客单价低，靠平台分发与累积销量；"
+     "内容或产品获客、再以服务或商品变现的混合形态同样走这条",
+     ["网文", "连载", "小说", "剧本", "漫画", "短剧", "短视频", "新媒体",
+      "播客", "独立站", "电商", "选品", "带货", "联盟营销", "导购",
+      "独立开发", "SaaS", "App", "插件", "独立游戏", "数字商品", "数字产品",
+      "上架", "稿费", "版税", "付费订阅", "付费通讯", "资料包", "素材包",
+      "电子书", "训练营", "会员社群", "POD", "众筹", "预售",
+      # 内容获客通道：获客端靠内容分发，变现端可能不是内容本身
+      "内容获客", "内容引流", "内容账号", "内容渠道", "做内容", "写内容",
+      "发内容", "更新内容", "公开内容", "靠内容",
+      # 原 T3 混合形态的关键词，v0.8.0 并入
+      "内容 + 服务", "内容+服务", "内容 + 电商", "内容+电商", "软件 + 服务", "软件+服务",
+      "社群 + 课程", "社群+课程", "服务 + 数字产品", "服务+数字产品",
+      "个人品牌", "多收入", "混合模式"]),
+]
+
+# 第 0 层自述的交付形态 → 验证路径（仅在方向关键词无命中时生效）
+FORM_TO_TRACK = {"内容": "T2", "产品": "T2", "实物": "T2", "服务": "T1", "混合": "T2"}
+
+TRACK_DEFAULT = "T1"       # 拿不准时走最严的一条路：T1 的门槛一项都不放松
+TRACK_PAYER_KEY = "payers"  # 两条路径的强验证入口同名，两种输入写法都读得到
+
+# 验证路径只有两条：T1 销售驱动 / T2 分发驱动（v0.8.0 起）。
+# 原「T3 混合」按获客通道判定——内容是分发通道——判据本就与 T2 完全一致，
+# 独立标签只会多一个分支，因此合并进 T2。混合形态的变现端是服务、商品还是订阅，
+# 不影响任何阈值，只是报告里同时列出 T1 等价项。
+TRACK_DIST_KEYS = ("T2", "T3")   # T3 仅作防御：归一化后不会出现在输出里
+TRACK_ALIASES = {"T3": "T2"}     # 旧配置/旧状态档案里的 T3 归一成 T2，不报错
+
+
+def is_dist_track(tk):
+    """True 表示该路径按分发驱动的证据载体判定（T2；T3 作为历史别名同样为 True）。"""
+    return str((tk or {}).get("key") or "").strip().upper() in TRACK_DIST_KEYS
+
+# 分发驱动的漏斗六环节 · 第十二章 12.1 闸门 3/4/5 的可核查对象
+FUNNEL_STAGES_T2 = [
+    ("units_listed", "上架单元", "已上架的单元数（章节 / 条目 / 商品 / 版本）", "判断供给是否真的开始"),
+    ("exposures", "有效曝光", "被目标受众看到的次数，不含泛流量", "判断渠道是否触达目标人群"),
+    ("engaged", "留存动作", "追读、收藏、打开、试用、加购等非付款留存", "判断需求是否真实"),
+    ("payers", "付费或结算", "付费人数、结算笔数与转化率", "判断真实付费意愿"),
+    ("deliveries", "交付完成", "按时交付率、返工率、签收率", "判断交付可控性"),
+    ("results", "累积结果", "复购 / 追更 / 续订、单作品或单产品的结算收入", "判断长期价值"),
+]
+
+# 预验证门槛 · 分发驱动（与销售驱动逐条等价，第三条完全一致）
+PREVALIDATION_T2 = {
+    "voices_min": 10,      # 目标受众原话条数（等价于 T1 的 10 次有效访谈）
+    "engaged_min": 30,     # 留存动作人数（等价于 T1 的 3 人愿意进一步）
+    "payers_min": 1,       # 付费或结算人数（与 T1 完全一致，不放宽）
+}
+
+# 最小可售单元 19 字段 · 第六章 6.1 一页纸启动书的分发驱动等价表
+MSU_FIELDS = [
+    ("target_audience", "目标受众"),
+    ("consumption_scene", "受众在什么情境下消费"),
+    ("unmet_need", "最痛且可验证的未满足需求"),
+    ("no_solution_loss", "不满足会失去什么"),
+    ("min_unit", "最小可售单元的形态（章节数 / 篇数 / 功能范围 / SKU）"),
+    ("deliverables", "具体产出物"),
+    ("exclusions", "不包含的内容"),
+    ("source_rights", "素材、字体、模型与授权来源"),
+    ("cycle_days", "单元产出周期"),
+    ("acceptance", "验收标准"),
+    ("price_terms", "定价与分成 / 结算口径"),
+    ("why_me", "为什么由我来做"),
+    ("channel_actions", "分发渠道与每周产能动作"),
+    ("direct_cost", "预计直接成本"),
+    ("unit_hours", "预计单元产能工时（每千字 / 每条 / 每单元）"),
+    ("gross_profit", "预计单元贡献利润"),
+    ("risks", "合规、版权、数据与平台依赖风险"),
+    ("stop_loss", "最大投入、最长试跑时间、继续指标"),
+    ("goal_90d", "90 天目标"),
+]
+
+# 分发驱动的书面约定 7 项 · 第六章 6.2 第 7 条的等价表
+CONTRACT_TERMS_T2 = ["版权", "授权", "分成", "更新", "退款", "数据", "售后"]
+
+# 两条路径的等价证据对照（报告原样展示，便于复核强度是否对等）
+TRACK_EQUIV = [
+    ("需求真实", "10 次目标客户访谈 + 原话", "10 条目标受众原话（评论 / 私信 / 评价区）"),
+    ("愿意进一步", "≥3 人愿看方案、给资料或预约报价", "≥30 人有留存动作（追读 / 收藏 / 试用）"),
+    ("必须收费", "报价 > 0", "单元定价 > 0；分成或结算口径明确"),
+    ("交付可控", "单人 ≤14 天完成交付", "单人产能边界可核验（日更 / 周更 / 单条工时）"),
+    ("首 3 单", "首 3 个客户 7 条验证标准", "首 3 个付费单元 7 条验证标准"),
+    ("单位经济", "单客贡献利润 · 有效时薪 · 获客回本周期", "单单元贡献利润 · 有效时薪 · 单元回本周期"),
+]
+
+TRACK_NOTE = ("验证路径只决定证据的载体，不放松任何阈值：付费或结算人数仍要求 ≥1，"
+              "绝对化表述、平台依赖、素材授权等检查一条不少。判定拿不准时默认走 T1。"
+              "混合形态（内容或产品获客、再以服务或商品变现）按获客通道归入 T2。")
 
 # 立即停止全职投入 · 第十章 10.1
 STOP_IMMEDIATE = [
@@ -476,6 +601,8 @@ def judge_score(cfg):
 
 def judge_econ(cfg):
     e = cfg.get("econ") or {}
+    tk = resolve_track(cfg)
+    unit = is_dist_track(tk)
     orders = e.get("orders") or []
     rate = num(e.get("target_hourly_rate"), 0.0) or 0.0
     cac = num(e.get("cac"))
@@ -483,9 +610,10 @@ def judge_econ(cfg):
 
     if not orders:
         return {
-            "level": "NO_DATA",
+            "level": "NO_DATA", "track": tk,
             "reason": "尚无交易数据，无法核算单位经济（不阻塞进入第二层，待有交易后回填）",
             "orders": [], "target_hourly_rate": rate,
+            "payback_label": "单元回本周期" if unit else "获客回本周期",
             "blocking": False,
         }
 
@@ -494,7 +622,7 @@ def judge_econ(cfg):
         rev = num(o.get("revenue"))
         cost = num(o.get("direct_cost"), 0.0) or 0.0
         hrs = num(o.get("hours"))
-        tag = o.get("customer") or ("订单 %d" % idx)
+        tag = o.get("customer") or o.get("unit") or ("订单 %d" % idx)
 
         if rev is None or hrs is None:
             incomplete.append({"order": tag, "reason": "收入或工时缺失"})
@@ -542,6 +670,7 @@ def judge_econ(cfg):
 
     return {
         "level": level, "reason": reason, "blocking": blocking,
+        "track": tk,
         "target_hourly_rate": rate,
         "orders": rows,
         "incomplete": incomplete, "loss_orders": loss, "below_target": below,
@@ -554,8 +683,11 @@ def judge_econ(cfg):
             "effective_hourly": round(agg_contrib / agg_hours, 2) if agg_hours else None,
         },
         "cac": cac,
+        "payback_label": "单元回本周期" if unit else "获客回本周期",
         "payback_periods": payback,
-        "note": "有收入无工时记录时无法判断业务是否成立（第六章 6.3）。",
+        "note": ("有收入无工时记录时无法判断业务是否成立（第六章 6.3）。" if not unit else
+                 "分发驱动按单元核算：单元贡献利润、有效时薪与单元回本周期；"
+                 "累积小单不改变「有收入必须有工时记录」这条规则（第六章 6.3）。"),
     }
 
 
@@ -709,14 +841,142 @@ def judge_direct(cfg):
     }
 
 
+def resolve_track(cfg):
+    """验证路径判定 · 候选方向产出之后执行，只选证据载体，不选选题（合规红线 9）。"""
+    raw = cfg.get("track")
+    explicit, why = None, ""
+    if isinstance(raw, dict):
+        explicit = raw.get("key") or raw.get("track")
+        why = raw.get("reason") or raw.get("note") or ""
+    elif isinstance(raw, str):
+        explicit = raw
+
+    by_key = {k: (label, desc) for k, label, desc, _kw in TRACKS}
+    g3 = cfg.get("gate3") or {}
+    dirs = g3.get("directions") or []
+    text = " ".join("%s %s" % ((d or {}).get("name") or "", (d or {}).get("notes") or "")
+                    for d in dirs if isinstance(d, dict))
+    form = str((cfg.get("profile") or {}).get("delivery_form") or "").strip()
+    text = text + " " + form
+
+    hist = {}
+    for key, _label, _desc, kws in TRACKS:
+        hist[key] = sum(1 for w in kws if w and w in text)
+
+    if explicit:
+        raw_key = str(explicit).strip().upper()
+        key = TRACK_ALIASES.get(raw_key, raw_key)   # 旧配置里的 T3 归一成 T2
+        if key in by_key:
+            label, desc = by_key[key]
+            note = TRACK_NOTE
+            if key != raw_key:
+                note = "「%s」已于 v0.8.0 合并进「%s」，按后者处理。%s" % (raw_key, key, TRACK_NOTE)
+            return {
+                "key": key, "label": label, "desc": desc,
+                "source": "explicit", "confidence": "high",
+                "reason": why or "宿主据候选方向的交易特征确认",
+                "aliased_from": raw_key if key != raw_key else None,
+                "hits": hist, "equiv": [{"stage": a, "t1": b, "t2": c} for a, b, c in TRACK_EQUIV],
+                "note": note,
+            }
+
+    t1, t2 = hist.get("T1", 0), hist.get("T2", 0)
+    if t2 >= 2 and t2 > t1:
+        key, conf = "T2", "medium"
+    elif t2 >= 1:
+        # t1 == 0：纯分发；t1 >= 1：混合形态（服务/商品变现），按获客通道同样归 T2
+        key, conf = "T2", ("low" if t1 == 0 else "medium")
+    elif (t1 + t2) == 0 and FORM_TO_TRACK.get(form):
+        key, conf = FORM_TO_TRACK[form], "low"
+    else:
+        key, conf = TRACK_DEFAULT, "low"
+
+    label, desc = by_key[key]
+    return {
+        "key": key, "label": label, "desc": desc,
+        "source": "inferred", "confidence": conf,
+        "reason": "按候选方向与交付形态的关键词判定（命中 %s）" % (
+            "、".join("%s %d" % (k, v) for k, v in sorted(hist.items()) if v) or "无，按最严路径默认"),
+        "hits": hist, "equiv": [{"stage": a, "t1": b, "t2": c} for a, b, c in TRACK_EQUIV],
+        "note": TRACK_NOTE,
+    }
+
+
+def _judge_funnel_t2(cfg, f, tk):
+    """分发驱动的六环节漏斗与预验证门槛（第十二章 12.1，与 T1 逐条等价）。"""
+    counts = {k: num(f.get(k)) for k, _l, _m, _p in FUNNEL_STAGES_T2}
+    counts["voices"] = num(f.get("voices"))
+    base = {
+        "track": tk, "thresholds": [], "stages": [], "bottleneck": None,
+        "loss_reasons": (f.get("loss_reasons") or section(cfg, "loss_reasons", "gate3") or {}),
+        "loss_reason_options": LOSS_REASONS,
+        "equiv": tk["equiv"],
+    }
+    if all(v is None for v in counts.values()):
+        base.update({
+            "level": "NO_DATA",
+            "reason": "未提供分发驱动漏斗数据。门槛需要 10 条目标受众原话、"
+                      "至少 30 人有留存动作、至少 1 人付费或结算",
+            "note": TRACK_NOTE,
+        })
+        return base
+
+    def c(k):
+        return counts.get(k) or 0
+
+    thresholds = [
+        {"key": "voices", "label": "目标受众原话",
+         "required": "≥ %d 条" % PREVALIDATION_T2["voices_min"],
+         "actual": c("voices"), "pass": c("voices") >= PREVALIDATION_T2["voices_min"]},
+        {"key": "engaged", "label": "有留存动作的人（追读 / 收藏 / 试用）",
+         "required": "≥ %d 人" % PREVALIDATION_T2["engaged_min"],
+         "actual": c("engaged"), "pass": c("engaged") >= PREVALIDATION_T2["engaged_min"]},
+        {"key": "payers", "label": "付费或平台结算",
+         "required": "≥ %d 人" % PREVALIDATION_T2["payers_min"],
+         "actual": c("payers"), "pass": c("payers") >= PREVALIDATION_T2["payers_min"]},
+    ]
+
+    stages, prev = [], None
+    for key, label, metric, purpose in FUNNEL_STAGES_T2:
+        v = counts.get(key)
+        rate = None
+        if prev and prev > 0 and v is not None:
+            rate = round(v / prev * 100, 1)
+        stages.append({"key": key, "label": label, "metric": metric, "purpose": purpose,
+                       "value": v, "conversion_pct": rate})
+        if v:
+            prev = v
+
+    drops = [s for s in stages if s["conversion_pct"] is not None]
+    bottleneck = min(drops, key=lambda s: s["conversion_pct"]) if drops else None
+
+    level = "PASS" if all(t["pass"] for t in thresholds) else (
+        "NO_PAYMENT" if not thresholds[2]["pass"] else "BELOW_THRESHOLD")
+    reason_map = {
+        "PASS": "三项预验证门槛均已达到（分发驱动）",
+        "BELOW_THRESHOLD": "有付费或结算，但受众原话条数或留存动作人数未达标",
+        "NO_PAYMENT": "尚无真实付费或结算。留存动作只是中等信号，不能替代付款；"
+                      "无法收款时归因到具体环节，不要直接得出「市场不存在」",
+    }
+    base.update({
+        "level": level, "reason": reason_map[level],
+        "thresholds": thresholds, "stages": stages, "bottleneck": bottleneck,
+        "note": "留存动作不是付款。没有结算记录，不得把方向称为已验证（第十二章 12.5）。",
+    })
+    return base
+
+
 def judge_funnel(cfg):
     f = section(cfg, "funnel", "gate3")
+    tk = resolve_track(cfg)
+    if is_dist_track(tk):
+        return _judge_funnel_t2(cfg, f, tk)
     counts = {k: num(f.get(k)) for k, _l, _m, _p in FUNNEL_STAGES}
     for extra in ("advanced", "payers"):
         counts[extra] = num(f.get(extra))
     if all(v is None for v in counts.values()):
         return {
-            "level": "NO_DATA",
+            "level": "NO_DATA", "track": tk,
             "reason": "未提供漏斗数据。预验证门槛需要 10–15 次有效访谈、至少 3 人愿意进一步、至少 1 人付款",
             "thresholds": [], "stages": [], "bottleneck": None,
         }
@@ -761,6 +1021,7 @@ def judge_funnel(cfg):
     }
     return {
         "level": level,
+        "track": tk,
         "reason": reason_map[level],
         "thresholds": thresholds,
         "stages": stages,
@@ -770,6 +1031,7 @@ def judge_funnel(cfg):
                          or section(cfg, "loss_reasons", "gate3")
                          or {}),
         "loss_reason_options": LOSS_REASONS,
+        "equiv": tk["equiv"],
         "note": "没有付款，不应把方向称为已验证（第一章 / 第五章 5.2）。",
     }
 
@@ -778,10 +1040,76 @@ def judge_funnel(cfg):
 # 闸门 4 · 付费与交付（第六章 6.1/6.2 + 第七章 7.2）
 # ══════════════════════════════════════════════════════════════════
 
-def judge_mso(cfg):
-    m = section(cfg, "mso", "gate4")
+def _mso_source(cfg, tk):
+    """分发驱动优先读 gate4.msu；写成 gate4.mso 也认（键名按 MSU 表）。"""
+    if is_dist_track(tk):
+        return section(cfg, "msu", "gate4") or section(cfg, "mso", "gate4")
+    return section(cfg, "mso", "gate4")
+
+
+def _judge_mso_t2(cfg, m, tk):
+    """分发驱动的最小可售单元（第十二章 12.1，字段数 19 与 T1 对齐）。"""
     if not m:
-        return {"level": "NO_DATA", "reason": "未提供最小可售 Offer（MSO）",
+        return {"level": "NO_DATA", "track": tk, "reason": "未提供最小可售单元（MSU）",
+                "missing_fields": [l for _k, l in MSU_FIELDS], "standards": [],
+                "pass_count": 0, "total_standards": 7, "field_count": len(MSU_FIELDS),
+                "equiv": tk["equiv"], "note": TRACK_NOTE}
+
+    missing = [label for key, label in MSU_FIELDS if blank(m.get(key))]
+    text_all = " ".join(str(m.get(k) or "") for k, _l in MSU_FIELDS)
+
+    cycle = num(m.get("cycle_days"))
+    price = num(m.get("price"))
+    has_triplet = all(not blank(m.get(k)) for k in ("target_audience", "unmet_need", "min_unit"))
+    has_io = all(not blank(m.get(k)) for k in ("deliverables", "acceptance", "exclusions"))
+    absolute = [w for w in ABSOLUTE_CLAIMS if w in text_all]
+    contract_missing = [t for t in CONTRACT_TERMS_T2 if t not in text_all]
+
+    standards = [
+        {"no": 1, "text": "受众在 3–10 秒内能听懂服务对象、未满足需求和单元形态",
+         "pass": has_triplet,
+         "detail": "" if has_triplet else "目标受众 / 未满足需求 / 单元形态 三项未齐备"},
+        {"no": 2, "text": "单元产出周期通常不超过 14 天（除非较长周期是受众必要条件）",
+         "pass": cycle is not None and cycle <= 14,
+         "detail": "已填 %.0f 天" % cycle if cycle is not None else "未填单元产出周期"},
+        {"no": 3, "text": "有明确的产出物、验收标准和不包含事项",
+         "pass": has_io, "detail": "" if has_io else "产出物 / 验收标准 / 不包含事项 有缺项"},
+        {"no": 4, "text": "必须收费，免费或纯流量不构成市场验证",
+         "pass": price is not None and price > 0,
+         "detail": "已填定价 %.0f" % price if price is not None else "未填定价或定价为 0"},
+        {"no": 5, "text": "单人可手动完成，且不依赖无法控制的长期配合",
+         "pass": not blank(m.get("unit_hours")),
+         "detail": "" if not blank(m.get("unit_hours")) else "未填单元产能工时，无法判断单人可控性"},
+        {"no": 6, "text": "不承诺无法控制的结果，不使用保证类高风险表述",
+         "pass": not absolute,
+         "detail": "" if not absolute else "命中绝对化表述：%s" % "、".join(absolute)},
+        {"no": 7, "text": "对版权、授权、分成、更新、退款、数据和售后有书面约定",
+         "pass": not contract_missing,
+         "detail": "" if not contract_missing else "未提及：%s" % "、".join(contract_missing)},
+    ]
+    passed = sum(1 for s in standards if s["pass"])
+    level = "OK" if (passed == len(standards) and not missing) else (
+        "INCOMPLETE" if missing else "NOT_READY")
+    return {
+        "level": level, "track": tk,
+        "reason": ("7 条最低标准全部满足，19 个单元字段齐备" if level == "OK" else
+                   ("缺 %d 个必填字段" % len(missing) if missing else
+                    "标准通过 %d/7，未达可售门槛" % passed)),
+        "missing_fields": missing,
+        "field_count": len(MSU_FIELDS),
+        "standards": standards, "pass_count": passed, "total_standards": len(standards),
+        "equiv": tk["equiv"],
+        "note": "必须收费。免费或纯流量只能用于内部练习，不能替代市场验证（第六章 6.2）。",
+    }
+
+
+def judge_mso(cfg):
+    tk = resolve_track(cfg)
+    m = _mso_source(cfg, tk)
+    if is_dist_track(tk):
+        return _judge_mso_t2(cfg, m, tk)
+    if not m:
+        return {"level": "NO_DATA", "track": tk, "reason": "未提供最小可售 Offer（MSO）",
                 "missing_fields": [l for _k, l in MSO_FIELDS], "standards": [],
                 "pass_count": 0, "total_standards": 7}
 
@@ -821,6 +1149,7 @@ def judge_mso(cfg):
         "INCOMPLETE" if missing else "NOT_READY")
     return {
         "level": level,
+        "track": tk,
         "reason": ("7 条最低标准全部满足，19 个字段齐备" if level == "OK" else
                    ("缺 %d 个必填字段" % len(missing) if missing else
                     "标准通过 %d/7，未达可售门槛" % passed)),
@@ -829,15 +1158,18 @@ def judge_mso(cfg):
         "standards": standards,
         "pass_count": passed,
         "total_standards": len(standards),
+        "equiv": tk["equiv"],
         "note": "必须收费。免费项目只能用于内部练习，不能替代市场验证（第六章 6.2）。",
     }
 
 
 def judge_delivery(cfg):
-    """首 3 个客户的验证标准 · 第七章 7.2。"""
+    """首 3 个客户（T1）/ 首 3 个付费单元（T2）的验证标准 · 第七章 7.2。"""
     d = section(cfg, "delivery", "gate4")
+    tk = resolve_track(cfg)
     if not d:
-        return {"level": "NO_DATA", "reason": "未提供交付结果记录", "checks": [], "pass_count": 0}
+        return {"level": "NO_DATA", "track": tk, "reason": "未提供交付结果记录",
+                "checks": [], "pass_count": 0, "equiv": tk["equiv"]}
 
     checks = [
         ("payment", "至少 1 个客户真实付款，最好累计 2–3 个不同客户的付款证据",
@@ -857,12 +1189,35 @@ def judge_delivery(cfg):
         ("willingness", "经过首单后，创业者仍愿意继续承担销售、交付和售后",
          d.get("still_willing") is True, ""),
     ]
+    if is_dist_track(tk):
+        checks = [
+            ("payment", "至少 1 个付费单元真实结算，最好累计 2–3 个单元的结算记录",
+             (num(d.get("paying_customers")) or 0) >= 1,
+             "已结算单元数 %s" % (d.get("paying_customers")
+                                  if d.get("paying_customers") is not None else "未填")),
+            ("scope_control", "单人独立完成产出，产能与交付范围没有失控",
+             d.get("scope_controlled") is True, ""),
+            ("positive_econ", "单元贡献利润为正，有效时薪没有持续低于个人可接受下限",
+             d.get("econ_positive") is True, ""),
+            ("client_feedback", "受众对结果、过程或体验给出具体正面反馈（评论、评价、私信原话）",
+             not blank(d.get("feedback")), ""),
+            ("follow_on", "至少有 1 个复购、追更、续订或明确的后续需求信号",
+             (num(d.get("follow_ons")) or 0) >= 1,
+             "复购 / 追更 %s" % (d.get("follow_ons") if d.get("follow_ons") is not None else "未填")),
+            ("compliant", "不依赖违法、侵权素材、未授权数据或单一平台",
+             d.get("compliant") is True, ""),
+            ("willingness", "完成首批单元后，仍愿意继续承担选题、产出、分发和售后",
+             d.get("still_willing") is True, ""),
+        ]
     rows = [{"key": k, "text": t, "pass": bool(p), "detail": det} for k, t, p, det in checks]
     passed = sum(1 for r in rows if r["pass"])
+    unit_word = "付费单元" if is_dist_track(tk) else "客户"
     return {
         "level": "PASS" if passed == len(rows) else "PARTIAL",
-        "reason": "首 3 个客户验证标准通过 %d/%d" % (passed, len(rows)),
+        "track": tk,
+        "reason": "首 3 个%s验证标准通过 %d/%d" % (unit_word, passed, len(rows)),
         "checks": rows, "pass_count": passed, "total_checks": len(rows),
+        "equiv": tk["equiv"],
         "note": "以上条件建议至少满足后才考虑增加投入（第七章 7.2）。",
     }
 
@@ -938,6 +1293,8 @@ def judge_stop(cfg):
 # ══════════════════════════════════════════════════════════════════
 
 def judge_assay(cfg):
+    tk = resolve_track(cfg)
+    t2 = is_dist_track(tk)
     has_score = bool((cfg.get("score") or {}).get("items"))
     gate1 = judge_gate1(cfg)
     score = judge_score(cfg) if has_score else None
@@ -954,6 +1311,7 @@ def judge_assay(cfg):
             "level": "INCOMPLETE",
             "level_text": ASSAY_LEVELS["INCOMPLETE"],
             "reason": "缺少必填输入：适配度评分（闸门 2）",
+            "track": tk,
             "gate1": gate1, "score": None, "econ": econ,
             "gate3": {"direct": direct, "funnel": funnel},
             "gate4": {"mso": mso, "delivery": delivery},
@@ -1040,7 +1398,9 @@ def judge_assay(cfg):
         for f in d.get("label_flags", []):
             gaps.append("方向「%s」命名待改：%s" % (d["name"], f))
     if funnel["level"] == "NO_DATA":
-        gaps.append("闸门 3 验证数据未评估：访谈数、愿意进一步人数、付款人数均未记录")
+        gaps.append("闸门 3 验证数据未评估：" + (
+            "受众原话条数、留存动作人数、付费或结算人数均未记录" if t2
+            else "访谈数、愿意进一步人数、付款人数均未记录"))
     elif funnel["level"] != "PASS":
         for t in funnel["thresholds"]:
             if not t["pass"]:
@@ -1049,14 +1409,16 @@ def judge_assay(cfg):
             b = funnel["bottleneck"]
             gaps.append("漏斗瓶颈在「%s」环节，转化率 %s%%" % (b["label"], b["conversion_pct"]))
     if mso["level"] == "NO_DATA":
-        gaps.append("闸门 4 未评估：需要一份一页纸 MSO")
+        gaps.append("闸门 4 未评估：" + ("需要一份最小可售单元定义（MSU）" if t2
+                                     else "需要一份一页纸 MSO"))
     elif mso["missing_fields"]:
         gaps.append("MSO 缺 %d 个必填字段：%s" % (len(mso["missing_fields"]), "、".join(mso["missing_fields"])))
     for s in mso.get("standards", []):
         if not s["pass"]:
             gaps.append("MSO 第 %d 条不满足：%s（%s）" % (s["no"], s["text"], s["detail"]))
     if delivery["level"] == "NO_DATA":
-        gaps.append("交付结果未评估：首 3 个客户验证标准待记录")
+        gaps.append("交付结果未评估：" + ("首 3 个付费单元验证标准待记录" if t2
+                                     else "首 3 个客户验证标准待记录"))
 
     repairs = []
     for r in score["rows"]:
@@ -1087,7 +1449,8 @@ def judge_assay(cfg):
         if mso.get("missing_fields"):
             nxt.append("补齐 MSO 的 %d 个必填字段" % len(mso["missing_fields"]))
         if funnel["level"] in ("NO_DATA", "NO_PAYMENT", "BELOW_THRESHOLD"):
-            nxt.append("完成 10–15 次目标客户访谈，并尝试收取第一笔定金或全款")
+            nxt.append("积累 10 条以上目标受众原话，上架最小可售单元并争取第一笔付费或结算"
+                       if t2 else "完成 10–15 次目标客户访谈，并尝试收取第一笔定金或全款")
         if stop["verdict"] == "ADJUST":
             nxt.append("按调整顺序改变 1–2 个关键变量后重试（最多 %d 轮，每轮约 %d 天）"
                        % (stop["rounds_limit"], stop["round_days"]))
@@ -1116,6 +1479,7 @@ def judge_assay(cfg):
         "level_text": ASSAY_LEVELS[level],
         "reason": "；".join(reasons) or "无阻断项",
         "caps": caps,
+        "track": tk,
         "gate1": gate1, "score": score, "econ": econ,
         "gate3": {"direct": direct, "funnel": funnel},
         "gate4": {"mso": mso, "delivery": delivery},
@@ -1182,36 +1546,81 @@ def state_init(cfg, path):
 
 
 def state_write(st, cfg):
+    """落盘。若已有档案且内容确实变化，先把旧档案另存为 *.bak 再覆盖。"""
     st["updated"] = today()
     st["engine_version"] = VERSION
     path = state_path(cfg)
+    body = json.dumps(st, ensure_ascii=False, indent=2) + "\n"
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                old = fh.read()
+            if old != body:
+                shutil.copyfile(path, path + ".bak")
+        except IOError:
+            pass
     with open(path, "w", encoding="utf-8") as fh:
-        json.dump(st, fh, ensure_ascii=False, indent=2)
-        fh.write("\n")
+        fh.write(body)
     return path
 
 
-def state_apply(st, cfg, stage=None, note=None, layer2=None):
+def filled(sec):
+    """这一节是否真的填了内容。
+
+    **不能用「键是否存在」判断**：`template()` 生成的骨架里 gate1、score.items 等
+    键全都在，只是值为空。按存在性判断会让一份裸模板被当成有效输入，
+    把已经存档的判定（如 SOFT_ALERT / 80.0）静默改写成 INCOMPLETE / 40.0。
+    """
+    if isinstance(sec, dict):
+        return any(filled(v) for v in sec.values())
+    if isinstance(sec, list):
+        return len(sec) > 0
+    if sec is None or sec is False or sec == "":
+        return False
+    return True
+
+
+def _record(changes, label, old, new, key):
+    """记录一次「已存档判定被改写」，供 CLI 显式播报，避免静默。"""
+    if changes is None or not isinstance(old, dict):
+        return
+    if old.get(key) != new.get(key):
+        changes.append((label, old.get(key), new.get(key)))
+
+
+def state_apply(st, cfg, stage=None, note=None, layer2=None, changes=None):
     l1 = st.setdefault("layer1", {})
-    if cfg.get("gate1"):
-        l1["gate1"] = {"level": judge_gate1(cfg)["level"], "checked": today()}
-    if (cfg.get("score") or {}).get("items"):
-        l1["score"] = {"total": judge_score(cfg)["total"], "checked": today()}
-    if (cfg.get("gate3") or {}).get("directions"):
+    if filled(cfg.get("gate1")):
+        new = {"level": judge_gate1(cfg)["level"], "checked": today()}
+        _record(changes, "layer1.gate1.level", l1.get("gate1"), new, "level")
+        l1["gate1"] = new
+    if filled((cfg.get("score") or {}).get("items")):
+        new = {"total": judge_score(cfg)["total"], "checked": today()}
+        _record(changes, "layer1.score.total", l1.get("score"), new, "total")
+        l1["score"] = new
+    if filled((cfg.get("gate3") or {}).get("directions")):
         d = judge_direct(cfg)
-        l1["gate3_direct"] = {"level": d["level"], "recommended": d.get("recommended"),
-                              "checked": today()}
-    if (cfg.get("gate3") or {}).get("funnel"):
+        new = {"level": d["level"], "recommended": d.get("recommended"), "checked": today()}
+        _record(changes, "layer1.gate3_direct.level", l1.get("gate3_direct"), new, "level")
+        l1["gate3_direct"] = new
+    if filled((cfg.get("gate3") or {}).get("funnel")):
         f = judge_funnel(cfg)
-        l1["gate3_funnel"] = {"level": f["level"], "checked": today()}
-    if (cfg.get("gate4") or {}).get("mso"):
-        l1["gate4_mso"] = {"level": judge_mso(cfg)["level"], "checked": today()}
-    if (cfg.get("econ") or {}).get("orders"):
-        l1["econ"] = {"level": judge_econ(cfg)["level"], "checked": today()}
-    if (cfg.get("score") or {}).get("items"):
+        new = {"level": f["level"], "checked": today()}
+        _record(changes, "layer1.gate3_funnel.level", l1.get("gate3_funnel"), new, "level")
+        l1["gate3_funnel"] = new
+    if filled((cfg.get("gate4") or {}).get("mso")) or filled((cfg.get("gate4") or {}).get("msu")):
+        new = {"level": judge_mso(cfg)["level"], "checked": today()}
+        _record(changes, "layer1.gate4_mso.level", l1.get("gate4_mso"), new, "level")
+        l1["gate4_mso"] = new
+    if filled((cfg.get("econ") or {}).get("orders")):
+        new = {"level": judge_econ(cfg)["level"], "checked": today()}
+        _record(changes, "layer1.econ.level", l1.get("econ"), new, "level")
+        l1["econ"] = new
+    if filled((cfg.get("score") or {}).get("items")):
         a = judge_assay(cfg)
-        l1["assay"] = {"level": a["level"], "scale_gate": a["scale_gate"]["pass"],
-                       "checked": today()}
+        new = {"level": a["level"], "scale_gate": a["scale_gate"]["pass"], "checked": today()}
+        _record(changes, "layer1.assay.level", l1.get("assay"), new, "level")
+        l1["assay"] = new
     if layer2:
         if not isinstance(layer2, dict):
             die("--layer2 需要是 JSON 对象")
@@ -1225,6 +1634,35 @@ def state_apply(st, cfg, stage=None, note=None, layer2=None):
     else:
         st["stage"] = infer_stage(st)
     return st
+
+
+def _report_changes(out):
+    """把「已存档判定被改写」显式打出来——这类改写默认是静默的，最容易被忽略。"""
+    if not out.get("changes"):
+        return
+    print("⚠️  本次写入改写了已存档的判定（旧档案已另存为 %s.bak）："
+          % os.path.basename(out["path"]))
+    for label, old, new in out["changes"]:
+        print("      %s：%s → %s" % (label, old, new))
+
+
+def cmd_state(cfg, stage=None, note=None, layer2=None):
+    """`state` 子命令的实现。
+
+    **只有给出 --note / --stage / --layer2 时才写盘**：只读调用既不创建也不改写档案，
+    更不会把旧档案里已存档的判定重算一遍覆盖掉。重算需要显式写入意图。
+    """
+    path = state_path(cfg)
+    existing = state_read(path)
+    st = existing if existing is not None else state_init(cfg, path)
+    changes, wrote = [], False
+    if stage or note or layer2:
+        st = state_apply(st, cfg, stage=stage, note=note, layer2=layer2, changes=changes)
+        state_write(st, cfg)
+        wrote = True
+    return {"path": path, "state": st, "wrote": wrote,
+            "created": existing is None and wrote, "changes": changes,
+            "stage": st.get("stage")}
 
 
 def infer_stage(st):
@@ -1785,6 +2223,9 @@ def render_report(cfg, mask=None):
     name = "OPC 创始人" if mask else (user.get("name") or "未署名")
     today_s = user.get("date") or today()
     signals = scan_signals(cfg.get("signal_texts"))
+    tk = res.get("track") or resolve_track(cfg)
+    t2 = is_dist_track(tk)
+    prof = cfg.get("profile") or {}
 
     parts = []
     parts.append('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">')
@@ -1813,6 +2254,21 @@ def render_report(cfg, mask=None):
     parts.append('<div class="card"><h2><span class="num">1</span>执行摘要</h2>')
     parts.append('<p class="src">综合第一章五道闸门、第三章适配度、第四至七章方向与验证、第十章退出的判据</p>')
     summ = []
+    if prof:
+        if mask:
+            summ.append(("当事人盘点", "已记录，不参与评分", "gray"))
+        else:
+            bits = []
+            if prof.get("weekly_hours"):
+                bits.append("每周可投入 %s 小时" % prof["weekly_hours"])
+            if prof.get("delivery_form"):
+                bits.append("交付形态：%s" % prof["delivery_form"])
+            if prof.get("exclusions"):
+                bits.append("排除项：%s" % prof["exclusions"])
+            summ.append(("当事人盘点", " · ".join(bits) or "已记录，不参与评分", "gray"))
+    summ.append(("验证路径", "%s %s（%s）" % (
+        tk.get("key"), tk.get("label"),
+        {"explicit": "已确认", "inferred": "据方向判定"}.get(tk.get("source"), "默认最严")), "gray"))
     if gate1:
         lv = gate1.get("level")
         tag = {"CLEAR": ("未命中", "green"), "SOFT_ALERT": ("软风险超限", "amber"),
@@ -1836,20 +2292,29 @@ def render_report(cfg, mask=None):
           "BELOW_THRESHOLD": ("门槛未达", "amber"), "NO_DATA": ("未评估", "gray")}.get(funnel.get("level"),
                                                                                     (funnel.get("level"), "gray"))
     th = funnel.get("thresholds") or []
-    summ.append(("闸门 3 预验证", "%s（访谈 %s · 愿进一步 %s · 付款 %s）" % (
-        ft[0], th[0]["actual"] if th else "—", th[1]["actual"] if th else "—",
-        th[2]["actual"] if th else "—"), ft[1]))
+    if t2:
+        summ.append(("闸门 3 预验证", "%s（受众原话 %s · 留存动作 %s · 付费或结算 %s）" % (
+            ft[0], th[0]["actual"] if th else "—", th[1]["actual"] if th else "—",
+            th[2]["actual"] if th else "—"), ft[1]))
+    else:
+        summ.append(("闸门 3 预验证", "%s（访谈 %s · 愿进一步 %s · 付款 %s）" % (
+            ft[0], th[0]["actual"] if th else "—", th[1]["actual"] if th else "—",
+            th[2]["actual"] if th else "—"), ft[1]))
     mt = {"OK": ("可售", "green"), "INCOMPLETE": ("字段缺失", "amber"),
           "NOT_READY": ("未达可售门槛", "amber"), "NO_DATA": ("未评估", "gray")}.get(mso.get("level"),
                                                                                 (mso.get("level"), "gray"))
-    summ.append(("闸门 4 最小可售 Offer", "%s（标准 %s/%s · 字段 %s/%s）" % (
-        mt[0], mso.get("pass_count", 0), mso.get("total_standards", 7),
-        mso.get("field_count", len(MSO_FIELDS)) - len(mso.get("missing_fields") or []),
-        mso.get("field_count", len(MSO_FIELDS))), mt[1]))
+    _mso_field_total = len(MSU_FIELDS if t2 else MSO_FIELDS)
+    summ.append(("闸门 4 %s" % ("最小可售单元" if t2 else "最小可售 Offer"),
+                 "%s（标准 %s/%s · 字段 %s/%s）" % (
+                     mt[0], mso.get("pass_count", 0), mso.get("total_standards", 7),
+                     mso.get("field_count", _mso_field_total)
+                     - len(mso.get("missing_fields") or []),
+                     mso.get("field_count", _mso_field_total)), mt[1]))
     if delivery.get("level") and delivery.get("level") != "NO_DATA":
         dt = ("通过", "green") if delivery["level"] == "PASS" else ("部分满足", "amber")
-        summ.append(("闸门 4 首 3 个客户", "%s（%s/%s）" % (dt[0], delivery.get("pass_count"),
-                                                       delivery.get("total_checks")), dt[1]))
+        summ.append(("闸门 4 %s" % ("首 3 个付费单元" if t2 else "首 3 个客户"),
+                     "%s（%s/%s）" % (dt[0], delivery.get("pass_count"),
+                                    delivery.get("total_checks")), dt[1]))
     if stopinfo.get("verdict") and stopinfo["verdict"] != "NO_DATA":
         st = {"KEEP": ("继续", "green"), "ADJUST": ("调整后重试", "amber"),
               "PAUSE": ("暂停", "red"), "STOP": ("建议停止或转向", "red"),
@@ -1990,7 +2455,8 @@ def render_report(cfg, mask=None):
         parts.append("<li>%s</li>" % esc(p))
     parts.append("</ul>")
 
-    parts.append("<h3>预验证门槛（第五章 5.2）</h3>")
+    parts.append("<h3>预验证门槛（%s）</h3>" % (
+        "第十二章 12.1 · 分发驱动" if t2 else "第五章 5.2"))
     if funnel.get("thresholds"):
         parts.append("<table><tr><th>门槛</th><th>要求</th><th class='n'>实际</th><th class='n'>结果</th></tr>")
         for t in funnel["thresholds"]:
@@ -2001,7 +2467,9 @@ def render_report(cfg, mask=None):
     else:
         parts.append("<p class='muted'>未记录访谈到成交的门槛数据。</p>")
     if funnel.get("stages") and any(s["value"] is not None for s in funnel["stages"]):
-        parts.append("<h3>访谈到成交的漏斗（第五章 5.3）</h3>")
+        parts.append("<h3>%s</h3>" % (
+            "内容到结算的漏斗（第十二章 12.1 · 分发驱动）" if t2
+            else "访谈到成交的漏斗（第五章 5.3）"))
         parts.append("<table><tr><th>环节</th><th>记录指标</th><th class='n'>数量</th>"
                      "<th class='n'>环比转化</th></tr>")
         for s in funnel["stages"]:
@@ -2015,13 +2483,29 @@ def render_report(cfg, mask=None):
                             "—" if s["conversion_pct"] is None else "%.1f%%" % s["conversion_pct"]))
         parts.append("</table>")
     if funnel.get("level") == "NO_PAYMENT":
-        parts.append('<div class="quote">尚无真实付款。无法收款时应归因到具体环节，'
-                     "而不是直接得出「市场不存在」：%s</div>" % esc(" · ".join(LOSS_REASONS)))
+        parts.append('<div class="quote">%s'
+                     "而不是直接得出「市场不存在」：%s</div>" % (
+                         "尚无真实付费或结算。留存动作只是中等信号，不能替代付款；"
+                         "无法收款时应归因到具体环节，" if t2
+                         else "尚无真实付款。无法收款时应归因到具体环节，",
+                         esc(" · ".join(LOSS_REASONS))))
+    if t2 and funnel.get("equiv"):
+        parts.append("<h3>两条验证路径的等价证据对照（第十二章 12.1.1）</h3>")
+        parts.append("<p class='muted'>分发驱动换的是证据载体，不是证据强度："
+                     "付费或结算人数与销售驱动完全一致，绝对化表述、平台依赖、"
+                     "素材授权等检查一条不少。</p>")
+        parts.append("<table><tr><th>环节</th><th>销售驱动（T1）</th>"
+                     "<th>分发驱动（T2）</th></tr>")
+        for e in funnel["equiv"]:
+            parts.append("<tr><td>%s</td><td class='muted'>%s</td><td>%s</td></tr>"
+                         % (esc(e["stage"]), esc(e["t1"]), esc(e["t2"])))
+        parts.append("</table>")
     parts.append("</div>")
 
     parts.append('<div class="card"><h2><span class="num">5</span>闸门 4 · 付费与交付</h2>')
     parts.append('<p class="src">出处：第六章 6.1 一页纸启动书 · 6.2 MSO 最低标准 · 第七章 7.2 首 3 个客户</p>')
-    parts.append("<h3>MSO 最低标准（第六章 6.2）</h3>")
+    parts.append("<h3>%s</h3>" % (
+        "最小可售单元最低标准（第六章 6.2）" if t2 else "MSO 最低标准（第六章 6.2）"))
     if mso.get("standards"):
         parts.append("<table><tr><th class='n'>#</th><th>标准</th><th class='n'>结果</th><th>说明</th></tr>")
         for s in mso["standards"]:
@@ -2032,14 +2516,19 @@ def render_report(cfg, mask=None):
         parts.append("</table>")
         parts.append("<p class='muted'>通过 %d / %d。</p>" % (mso["pass_count"], mso["total_standards"]))
     else:
-        parts.append("<p class='muted'>未提供 MSO。闸门 4 需要一份范围明确、周期清楚、必须收费的最小可售 Offer。</p>")
+        parts.append("<p class='muted'>%s</p>" % (
+            "未提供最小可售单元。闸门 4 需要一个范围明确、周期清楚、必须收费的最小可售单元，"
+            "并写明定价与分成或结算口径。" if t2
+            else "未提供 MSO。闸门 4 需要一份范围明确、周期清楚、必须收费的最小可售 Offer。"))
     if mso.get("missing_fields"):
-        parts.append("<h3>一页纸启动书缺失字段（第六章 6.1）</h3><ul class='clean warn'>")
+        parts.append("<h3>%s（第六章 6.1）</h3><ul class='clean warn'>" % (
+            "最小可售单元缺失字段" if t2 else "一页纸启动书缺失字段"))
         for f in mso["missing_fields"]:
             parts.append("<li>%s</li>" % esc(f))
         parts.append("</ul>")
     if delivery.get("checks"):
-        parts.append("<h3>首 3 个客户的验证标准（第七章 7.2）</h3>")
+        parts.append("<h3>%s（第七章 7.2）</h3>" % (
+            "首 3 个付费单元的验证标准" if t2 else "首 3 个客户的验证标准"))
         parts.append("<table><tr><th>条件</th><th class='n'>满足</th></tr>")
         for c in delivery["checks"]:
             parts.append("<tr><td>%s</td><td class='n'>%s</td></tr>"
@@ -2053,9 +2542,9 @@ def render_report(cfg, mask=None):
         if econ["level"] == "NO_DATA":
             parts.append("<p class='muted'>尚无交易数据，单位经济待有真实订单后回填。</p>")
         else:
-            parts.append("<table><tr><th>订单</th><th class='n'>收入</th><th class='n'>直接成本</th>"
+            parts.append("<table><tr><th>%s</th><th class='n'>收入</th><th class='n'>直接成本</th>"
                          "<th class='n'>工时</th><th class='n'>贡献利润</th><th class='n'>利润率</th>"
-                         "<th class='n'>有效时薪</th></tr>")
+                         "<th class='n'>有效时薪</th></tr>" % ("单元" if t2 else "订单"))
             for idx, o in enumerate(econ["orders"], 1):
                 parts.append("<tr><td>%s</td><td class='n'>%s</td><td class='n'>%s</td><td class='n'>%s</td>"
                              "<td class='n'>%s</td><td class='n'>%s</td><td class='n'>%s</td></tr>"
@@ -2414,6 +2903,8 @@ def template():
     t = {
         "user": {"name": "", "date": today(), "audience": "external"},
         "signal_texts": [],
+        "profile": {k: "" for k, _l, _u in PROFILE_FIELDS},
+        "track": {"key": "", "reason": ""},
         "gate1": {
             "safety_cushion": {"cash": None, "monthly_essential": None, "target_months": None},
             "redlines": {k: False for k, _ in HARD_REDLINES},
@@ -2432,6 +2923,7 @@ def template():
         },
         "gate4": {
             "mso": {k: "" for k, _l in MSO_FIELDS},
+            "msu": {k: "" for k, _l in MSU_FIELDS},
             "delivery": {"paying_customers": None, "scope_controlled": None, "econ_positive": None,
                          "feedback": "", "follow_ons": None, "compliant": None, "still_willing": None},
         },
@@ -2469,6 +2961,16 @@ def template():
 # 自检
 # ══════════════════════════════════════════════════════════════════
 
+def _deep_merge(dst, src):
+    """把 src 覆盖进 dst（递归合并字典），供自检用例的 extends / patch 使用。"""
+    for k, v in (src or {}).items():
+        if isinstance(v, dict) and isinstance(dst.get(k), dict):
+            _deep_merge(dst[k], v)
+        else:
+            dst[k] = v
+    return dst
+
+
 def _dig(obj, path):
     cur = obj
     for seg in path.split("."):
@@ -2494,11 +2996,27 @@ def run_selftest(cases_path=None):
     with open(cases_path, "r", encoding="utf-8") as fh:
         cases = json.load(fh).get("cases") or []
 
+    by_id = {c.get("id"): c for c in cases}
+
+    def _cfg_of(case, _seen=None):
+        # 支持多层继承：先递归解出基例的 config，再叠加本例的 patch。
+        # 单层实现会在「基例本身也是 extends」时读到空配置，用例静默失效。
+        base_id = case.get("extends")
+        if not base_id:
+            return case.get("config") or {}
+        _seen = _seen or set()
+        if base_id in _seen:
+            raise RuntimeError("用例 extends 成环：%s" % base_id)
+        _seen.add(base_id)
+        base = by_id.get(base_id) or {}
+        out = json.loads(json.dumps(_cfg_of(base, _seen)))
+        return _deep_merge(out, case.get("patch") or {})
+
     passed, failed = 0, []
     for c in cases:
         name = c.get("name") or c.get("id")
         kind = c.get("kind")
-        cfg = c.get("config") or {}
+        cfg = _cfg_of(c)
         pre_bad, got = [], None
 
         if kind == "signal":
@@ -2521,6 +3039,8 @@ def run_selftest(cases_path=None):
             got = judge_stop(cfg)
         elif kind == "assay":
             got = judge_assay(cfg)
+        elif kind == "track":
+            got = resolve_track(cfg)
         elif kind == "modes":
             got = judge_modes(cfg)
         elif kind == "modes_meta":
@@ -2581,6 +3101,23 @@ def run_selftest(cases_path=None):
                    "skill_rules": len(c.get("skill_rules") or []),
                    "script_rules": len(c.get("script_rules") or []),
                    "missing": missing}
+        elif kind == "docs_contains":
+            root = os.path.normpath(os.path.join(here, os.pardir))
+            missing, total = [], 0
+            for rel, needles in (c.get("groups") or {}).items():
+                fp = os.path.join(root, rel)
+                try:
+                    with open(fp, encoding="utf-8") as fh:
+                        body = fh.read()
+                except IOError:
+                    body = ""
+                if not body:
+                    missing.append("%s（文件缺失）" % rel)
+                for nd in (needles or []):
+                    total += 1
+                    if nd not in body:
+                        missing.append("%s 缺少 %r" % (rel, nd))
+            got = {"rules": total, "missing": missing}
         elif kind == "frontmatter":
             fp = os.path.join(here, os.pardir, "SKILL.md")
             with open(fp, encoding="utf-8") as fh:
@@ -2605,6 +3142,59 @@ def run_selftest(cases_path=None):
                     if gone in keys:
                         problems.append("不应再出现已废弃字段 %s" % gone)
             got = {"fields": len(keys), "problems": problems}
+        elif kind == "state_ro":
+            # 回归：--print 只读 + 空模板不得覆盖已存档判定（静默覆盖 bug）
+            import hashlib
+            import tempfile
+            tmpd = tempfile.mkdtemp(prefix="opc_state_")
+            spath = os.path.join(tmpd, "opc-bootstrap-state.json")
+
+            def _md5(p):
+                with open(p, "rb") as fh:
+                    return hashlib.md5(fh.read()).hexdigest()
+
+            def _lvl(st):
+                l1 = st.get("layer1") or {}
+                return (l1.get("gate1") or {}).get("level"), (l1.get("score") or {}).get("total")
+
+            real = json.loads(json.dumps(cfg))
+            real.setdefault("state", {})["path"] = spath
+
+            base = cmd_state(real, note="基线")
+            b_gate1, b_score = _lvl(base["state"])
+            b_notes = len(base["state"]["notes"])
+
+            h0 = _md5(spath)
+            ro = cmd_state(real)                        # 无写意图：只读
+            h1 = _md5(spath)
+
+            bare = template()                           # 裸模板：键在、值为空
+            bare.setdefault("state", {})["path"] = spath
+            bare.setdefault("user", {})["name"] = "裸模板"
+            after = cmd_state(bare, note="裸模板")
+            a_gate1, a_score = _lvl(after["state"])
+
+            legit = json.loads(json.dumps(real))        # 真实的判定变更
+            legit["score"]["items"]["motive_choice"]["score"] = 1
+            ow = cmd_state(legit, note="变更")
+
+            got = {
+                "ro_wrote": ro["wrote"],
+                "ro_created": ro["created"],
+                "ro_stable": h1 == h0,
+                "ro_changes": len(ro["changes"]),
+                "bare_kept": (a_gate1, a_score) == (b_gate1, b_score),
+                "bare_notes_delta": len(after["state"]["notes"]) - b_notes,
+                "overwrite_recorded": len(ow["changes"]) > 0,
+                "bak_written": os.path.exists(spath + ".bak"),
+            }
+            for _p in (spath + ".bak", spath):
+                if os.path.exists(_p):
+                    os.remove(_p)
+            try:
+                os.rmdir(tmpd)
+            except OSError:
+                pass
         elif kind == "board":
             got = judge_board(cfg)
         elif kind in ("report", "board_html"):
@@ -2776,28 +3366,29 @@ def main(argv=None):
                 fh.write(html_out)
             print("报告已生成：%s（%d 字节）" % (args.out, len(html_out.encode("utf-8"))))
         if args.sync_state or args.sync_only:
-            path = state_path(cfg)
-            st = state_read(path) or state_init(cfg, path)
-            st = state_apply(st, cfg, note="report 同步")
-            state_write(st, cfg)
-            print("状态档案已同步：%s（阶段 %s）" % (path, st["stage"]))
+            out = cmd_state(cfg, note="report 同步")
+            _report_changes(out)
+            print("状态档案已同步：%s（阶段 %s）" % (out["path"], out["stage"]))
     elif args.cmd == "state":
-        path = state_path(cfg)
-        st = state_read(path)
-        if st is None:
-            st = state_init(cfg, path)
         layer2 = None
         if getattr(args, "layer2", None):
             try:
                 layer2 = json.loads(args.layer2)
             except ValueError as exc:
                 die("--layer2 不是合法 JSON：%s" % exc)
-        st = state_apply(st, cfg, stage=args.stage, note=args.note, layer2=layer2)
-        state_write(st, cfg)
+        out = cmd_state(cfg, stage=args.stage, note=args.note, layer2=layer2)
+        _report_changes(out)
         if args.show:
-            dump(st)
+            dump(out["state"])
+        elif out["wrote"]:
+            print("状态档案：%s\n阶段：%s（%s）"
+                  % (out["path"], out["stage"], STAGE_LABEL.get(out["stage"], "")))
         else:
-            print("状态档案：%s\n阶段：%s（%s）" % (path, st["stage"], STAGE_LABEL.get(st["stage"], "")))
+            print("状态档案：%s（只读，未写入）" % out["path"])
+            print("要变更档案，请加 --note / --stage / --layer2；--print 只读。")
+            if not os.path.exists(out["path"]):
+                print("（档案尚不存在，以下为初始化骨架，未落盘）")
+                dump(out["state"])
     return 0
 
 

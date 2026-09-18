@@ -5,6 +5,18 @@
     "audience": "external"
   },
   "signal_texts": [],
+  "profile": {
+    "weekly_hours": "",
+    "time_window": "",
+    "existing_assets": "",
+    "constraints": "",
+    "exclusions": "",
+    "delivery_form": ""
+  },
+  "track": {
+    "key": "",
+    "reason": ""
+  },
   "gate1": {
     "safety_cushion": {
       "cash": null,
@@ -151,6 +163,27 @@
       "channel_actions": "",
       "direct_cost": "",
       "delivery_hours": "",
+      "gross_profit": "",
+      "risks": "",
+      "stop_loss": "",
+      "goal_90d": ""
+    },
+    "msu": {
+      "target_audience": "",
+      "consumption_scene": "",
+      "unmet_need": "",
+      "no_solution_loss": "",
+      "min_unit": "",
+      "deliverables": "",
+      "exclusions": "",
+      "source_rights": "",
+      "cycle_days": "",
+      "acceptance": "",
+      "price_terms": "",
+      "why_me": "",
+      "channel_actions": "",
+      "direct_cost": "",
+      "unit_hours": "",
       "gross_profit": "",
       "risks": "",
       "stop_loss": "",
