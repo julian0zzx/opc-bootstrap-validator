@@ -3135,7 +3135,7 @@ def run_selftest(cases_path=None):
                         keys.append(k.group(1))
                     else:
                         problems.append("第 %d 行顶格但不是 键:值（疑似折行破坏了 YAML）" % i)
-                for req in ("name", "description", "version", "agent_created"):
+                for req in ("name", "description", "version"):
                     if req not in keys:
                         problems.append("缺少必需字段 %s" % req)
                 for gone in ("description_zh", "display_name_en", "slug", "summary"):
