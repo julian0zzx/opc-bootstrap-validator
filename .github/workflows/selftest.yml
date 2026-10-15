@@ -30,7 +30,7 @@ jobs:
           python scripts/gate.py report --config evals/demo_input.json --out /tmp/report.html > /dev/null
           python scripts/gate.py template --out /tmp/tpl.json > /dev/null
 
-      - name: 第一层未过时 modes 必须 rc=4（顺序闸门）
+      - name: 第一层未过时 modes 必须 rc=4（顺序红线）
         run: |
           python - <<'PY'
           import json, subprocess, sys

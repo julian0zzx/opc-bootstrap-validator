@@ -34,14 +34,14 @@ SCHEMA = "opc-bootstrap-validator/1"
 # ══════════════════════════════════════════════════════════════════
 # 第 0 层 · 当事人盘点（开场后 1 轮，不评分、不否决、不封顶）
 # ══════════════════════════════════════════════════════════════════
-# 用途只有三处：① 闸门 3 生成候选方向的输入；② 闸门 2 提问时的锚定；
+# 用途只有三处：① 红线 3 生成候选方向的输入；② 红线 2 提问时的锚定；
 # ③ 报告执行摘要回显。当事人自述的禀赋**不构成任何评分项的证据**。
 
 PROFILE_FIELDS = [
-    ("weekly_hours", "每周可稳定投入的小时数", "闸门 2「每周可稳定投入时间」的证据；判断 14 天交付可行性"),
+    ("weekly_hours", "每周可稳定投入的小时数", "红线 2「每周可稳定投入时间」的证据；判断 14 天交付可行性"),
     ("time_window", "可投入的时段", "判断是否需要与主业、照护责任错峰"),
-    ("existing_assets", "手上已经能直接用的东西", "闸门 2「可对外售卖的专业能力」「可重复触达渠道」的线索"),
-    ("constraints", "未来 12 个月的硬约束", "闸门 1 红线 4/5：健康、照护、体力、地域、语言、实名与露脸"),
+    ("existing_assets", "手上已经能直接用的东西", "红线 2「可对外售卖的专业能力」「可重复触达渠道」的线索"),
+    ("constraints", "未来 12 个月的硬约束", "红线 1 红线 4/5：健康、照护、体力、地域、语言、实名与露脸"),
     ("exclusions", "明确不愿做的事", "方向生成时排除，避免生成当事人心理上排斥的方向"),
     ("delivery_form", "更想交付的形态", "方向生成的输入；也是验证路径的初判线索"),
 ]
@@ -49,7 +49,7 @@ PROFILE_FIELDS = [
 DELIVERY_FORMS = ["服务", "内容", "产品", "实物", "混合"]
 
 PROFILE_RULE = ("第 0 层不评分、不否决、不封顶。当事人自述的禀赋只用于生成候选方向与锚定提问，"
-                "不能顶替闸门 2 的证据——每一项仍要有自己的案例、记录、回款或结算凭证。")
+                "不能顶替红线 2 的证据——每一项仍要有自己的案例、记录、回款或结算凭证。")
 
 # 硬红线 · 第二章 2.1
 HARD_REDLINES = [
@@ -234,7 +234,7 @@ def is_dist_track(tk):
     """True 表示该路径按分发驱动的证据载体判定（T2；T3 作为历史别名同样为 True）。"""
     return str((tk or {}).get("key") or "").strip().upper() in TRACK_DIST_KEYS
 
-# 分发驱动的漏斗六环节 · 第十二章 12.1 闸门 3/4/5 的可核查对象
+# 分发驱动的漏斗六环节 · 第十二章 12.1 红线 3/4/5 的可核查对象
 FUNNEL_STAGES_T2 = [
     ("units_listed", "上架单元", "已上架的单元数（章节 / 条目 / 商品 / 版本）", "判断供给是否真的开始"),
     ("exposures", "有效曝光", "被目标受众看到的次数，不含泛流量", "判断渠道是否触达目标人群"),
@@ -448,7 +448,7 @@ def blank(v):
 def section(cfg, key, *parents):
     """读取一个数据段，兼容顶层与嵌套两种写法。
 
-    闸门 3 与闸门 4 各自包含两个子段（方向 + 漏斗 / MSO + 交付），
+    红线 3 与红线 4 各自包含两个子段（方向 + 漏斗 / MSO + 交付），
     用户可能写成顶层 `funnel`，也可能按章节语义写成 `gate3.funnel`。
     两种写法都接受，顶层优先；都不存在时返回空 dict。
     """
@@ -471,7 +471,7 @@ def esc(v):
 
 
 # ══════════════════════════════════════════════════════════════════
-# 闸门 1 · 硬红线 + 软风险 + 止损三数字（第二章）
+# 红线 1 · 硬红线 + 软风险 + 止损三数字（第二章）
 # ══════════════════════════════════════════════════════════════════
 
 def judge_gate1(cfg):
@@ -521,12 +521,12 @@ def judge_gate1(cfg):
         "cushion_ok": cushion_ok,
         "stop_loss": stop,
         "stop_loss_missing": missing_stop,
-        "note": "硬红线是闸门不是分数：命中即锁定，后续评分不得覆盖（第三章 3.3）。",
+        "note": "硬红线是红线不是分数：命中即锁定，后续评分不得覆盖（第三章 3.3）。",
     }
 
 
 # ══════════════════════════════════════════════════════════════════
-# 闸门 2 · 适配度评分（第三章）
+# 红线 2 · 适配度评分（第三章）
 # ══════════════════════════════════════════════════════════════════
 
 def judge_score(cfg):
@@ -596,7 +596,7 @@ def judge_score(cfg):
 
 
 # ══════════════════════════════════════════════════════════════════
-# 闸门 5 · 单位经济（第六章 6.3、第九章）
+# 红线 5 · 单位经济（第六章 6.3、第九章）
 # ══════════════════════════════════════════════════════════════════
 
 def judge_econ(cfg):
@@ -754,7 +754,7 @@ def scan_signals(texts):
 
 
 # ══════════════════════════════════════════════════════════════════
-# 闸门 3 · 问题与客户（第四章 4.1/4.2 + 第五章 5.2/5.3）
+# 红线 3 · 问题与客户（第四章 4.1/4.2 + 第五章 5.2/5.3）
 # ══════════════════════════════════════════════════════════════════
 
 VAGUE_LABEL_WORDS = ["咨询", "顾问", "代运营", "培训", "设计", "开发", "内容创作", "营销", "服务"]
@@ -1037,7 +1037,7 @@ def judge_funnel(cfg):
 
 
 # ══════════════════════════════════════════════════════════════════
-# 闸门 4 · 付费与交付（第六章 6.1/6.2 + 第七章 7.2）
+# 红线 4 · 付费与交付（第六章 6.1/6.2 + 第七章 7.2）
 # ══════════════════════════════════════════════════════════════════
 
 def _mso_source(cfg, tk):
@@ -1310,13 +1310,13 @@ def judge_assay(cfg):
         return {
             "level": "INCOMPLETE",
             "level_text": ASSAY_LEVELS["INCOMPLETE"],
-            "reason": "缺少必填输入：适配度评分（闸门 2）",
+            "reason": "缺少必填输入：适配度评分（红线 2）",
             "track": tk,
             "gate1": gate1, "score": None, "econ": econ,
             "gate3": {"direct": direct, "funnel": funnel},
             "gate4": {"mso": mso, "delivery": delivery},
             "stop": stop,
-            "gaps": ["闸门 2 未评估"], "repairs": [], "next_actions": [],
+            "gaps": ["红线 2 未评估"], "repairs": [], "next_actions": [],
             "may_enter_layer2": False, "scale_gate": {"pass": False, "items": []},
             "evidence_rule": EVIDENCE_RULE,
         }
@@ -1353,22 +1353,22 @@ def judge_assay(cfg):
         level = cap_at("CONDITIONAL", "单位经济阻断：%s" % econ["reason"])
 
     if direct["level"] == "NO_DATA":
-        level = cap_at("CONDITIONAL", "闸门 3 未评估（没有候选方向）")
+        level = cap_at("CONDITIONAL", "红线 3 未评估（没有候选方向）")
     elif direct["level"] == "NO_QUALIFIED":
-        reasons.append("闸门 3：%s" % direct["reason"])
-        level = cap_at("INSUFFICIENT", "闸门 3 无合格方向")
+        reasons.append("红线 3：%s" % direct["reason"])
+        level = cap_at("INSUFFICIENT", "红线 3 无合格方向")
     elif funnel["level"] == "NO_DATA":
-        level = cap_at("CONDITIONAL", "闸门 3 验证数据未评估（漏斗为空）")
+        level = cap_at("CONDITIONAL", "红线 3 验证数据未评估（漏斗为空）")
     elif funnel["level"] == "NO_PAYMENT":
-        level = cap_at("CONDITIONAL", "闸门 3/4：尚无真实付款证据")
+        level = cap_at("CONDITIONAL", "红线 3/4：尚无真实付款证据")
     elif funnel["level"] == "BELOW_THRESHOLD":
-        level = cap_at("CONDITIONAL", "闸门 3：预验证门槛未达")
+        level = cap_at("CONDITIONAL", "红线 3：预验证门槛未达")
 
     if mso["level"] == "NO_DATA":
-        level = cap_at("CONDITIONAL", "闸门 4 未评估（没有 MSO）")
+        level = cap_at("CONDITIONAL", "红线 4 未评估（没有 MSO）")
     elif mso["level"] in ("INCOMPLETE", "NOT_READY"):
-        reasons.append("闸门 4：%s" % mso["reason"])
-        level = cap_at("CONDITIONAL", "闸门 4：MSO %s" % mso["reason"])
+        reasons.append("红线 4：%s" % mso["reason"])
+        level = cap_at("CONDITIONAL", "红线 4：MSO %s" % mso["reason"])
 
     if stop["verdict"] in ("EXIT_NOW", "STOP", "EXIT"):
         reasons.append("止损监控：%s" % stop["reason"])
@@ -1389,7 +1389,7 @@ def judge_assay(cfg):
     if econ["level"] == "NO_DATA":
         gaps.append("尚无交易数据，单位经济待回填")
     if direct["level"] == "NO_DATA":
-        gaps.append("闸门 3 未评估：需要从四类证据出发生成 3–5 个候选方向")
+        gaps.append("红线 3 未评估：需要从四类证据出发生成 3–5 个候选方向")
     for d in direct.get("directions", []):
         if d["floor_violations"]:
             gaps.append("方向「%s」有 %d 项低于 3 分的硬约束：%s" % (
@@ -1398,7 +1398,7 @@ def judge_assay(cfg):
         for f in d.get("label_flags", []):
             gaps.append("方向「%s」命名待改：%s" % (d["name"], f))
     if funnel["level"] == "NO_DATA":
-        gaps.append("闸门 3 验证数据未评估：" + (
+        gaps.append("红线 3 验证数据未评估：" + (
             "受众原话条数、留存动作人数、付费或结算人数均未记录" if t2
             else "访谈数、愿意进一步人数、付款人数均未记录"))
     elif funnel["level"] != "PASS":
@@ -1409,7 +1409,7 @@ def judge_assay(cfg):
             b = funnel["bottleneck"]
             gaps.append("漏斗瓶颈在「%s」环节，转化率 %s%%" % (b["label"], b["conversion_pct"]))
     if mso["level"] == "NO_DATA":
-        gaps.append("闸门 4 未评估：" + ("需要一份最小可售单元定义（MSU）" if t2
+        gaps.append("红线 4 未评估：" + ("需要一份最小可售单元定义（MSU）" if t2
                                      else "需要一份一页纸 MSO"))
     elif mso["missing_fields"]:
         gaps.append("MSO 缺 %d 个必填字段：%s" % (len(mso["missing_fields"]), "、".join(mso["missing_fields"])))
@@ -1458,7 +1458,7 @@ def judge_assay(cfg):
         nxt = ["进入第二层：确定 OPC 模式，激活该模式的专属指标",
                "选定北极星指标 1 个、过程指标 2 个、安全指标 2 个，进入周期记录"]
 
-    # 扩大投入闸门 · 第十一章末段：真实付款 + 可控交付 + 单位经济为正 + 风险可控
+    # 扩大投入红线 · 第十一章末段：真实付款 + 可控交付 + 单位经济为正 + 风险可控
     paid = (funnel["level"] in ("PASS", "BELOW_THRESHOLD")) or \
            (num(delivery.get("pass_count")) or 0) > 0 or bool((cfg.get("econ") or {}).get("orders"))
     scale_items = [
@@ -1865,7 +1865,7 @@ def judge_modes(cfg, mods=None):
             "ok": False,
             "level": "BLOCKED_ORDER",
             "reason": "模式目录不得反用于选题：必须先产出合格候选方向，再用模式地图归类。",
-            "detail": "闸门 3 当前状态 %s，没有同时满足三项硬约束（合规与依赖风险 / 客户可触达性 / 交付可控性 ≥ 3 分）的方向。"
+            "detail": "红线 3 当前状态 %s，没有同时满足三项硬约束（合规与依赖风险 / 客户可触达性 / 交付可控性 ≥ 3 分）的方向。"
                       % direct.get("level"),
             "required": "gate3.directions[] 中至少一个方向合格",
             "next_action": "先跑 direct：从第四章四类证据（过去做成的 / 别人反复来问的 / 市场已在花钱解决的 / 14 天能交付的）"
@@ -1954,7 +1954,7 @@ def judge_modes(cfg, mods=None):
         out["warning"] = "匹配结果不唯一，前两名得分接近，请与用户确认后再锁指标。"
     if matched_direction is None:
         out["warning"] = ("layer2.direction=%r 不在本次合格候选方向里，已按该描述归类；"
-                          "若方向本身还没过闸门 3，第二层结论不成立。" % chosen)
+                          "若方向本身还没过红线 3，第二层结论不成立。" % chosen)
     return out
 
 
@@ -2045,7 +2045,7 @@ def judge_board(cfg, mods=None, modes_res=None):
     autofill = {
         "我的 OPC 模式": (modes_res.get("mode") or {}).get("name"),
         "主要收入来源": l2.get("revenue_source"),
-        "第一层五道闸门当前状态": "%s（%s）" % (assay.get("level"),
+        "第一层五道红线当前状态": "%s（%s）" % (assay.get("level"),
                                               ASSAY_LEVELS.get(assay.get("level"), "")),
     }
     # 五槽位已填时，记录格式里对应的 5 项自动回填，避免同一件事填两遍
@@ -2076,7 +2076,7 @@ def judge_board(cfg, mods=None, modes_res=None):
         "gated": not layer1_ok,
         "gate_notice": (None if layer1_ok else
                         "第一层未通过（%s）。本看板只作为记录模板，不构成扩大投入或全职化的依据——"
-                        "两层闸门必须同时通过。" % assay.get("level")),
+                        "两层红线必须同时通过。" % assay.get("level")),
         "mode": modes_res.get("mode"),
         "category": modes_res.get("category"),
         "mode_unresolved": not modes_res.get("ok"),
@@ -2252,7 +2252,7 @@ def render_report(cfg, mask=None):
     parts.append('<p class="txt">%s</p></div>' % esc(res.get("reason", "")))
 
     parts.append('<div class="card"><h2><span class="num">1</span>执行摘要</h2>')
-    parts.append('<p class="src">综合第一章五道闸门、第三章适配度、第四至七章方向与验证、第十章退出的判据</p>')
+    parts.append('<p class="src">综合第一章五道红线、第三章适配度、第四至七章方向与验证、第十章退出的判据</p>')
     summ = []
     if prof:
         if mask:
@@ -2287,24 +2287,24 @@ def render_report(cfg, mask=None):
         summ.append(("单位经济", econ_tag[0], econ_tag[1]))
     g3t = {"OK": ("有合格方向", "green"), "NO_QUALIFIED": ("无合格方向", "red"),
            "NO_DATA": ("未评估", "gray")}.get(direct.get("level"), (direct.get("level"), "gray"))
-    summ.append(("闸门 3 方向选择", "%s（推荐：%s）" % (g3t[0], direct.get("recommended") or "—"), g3t[1]))
+    summ.append(("红线 3 方向选择", "%s（推荐：%s）" % (g3t[0], direct.get("recommended") or "—"), g3t[1]))
     ft = {"PASS": ("门槛达标", "green"), "NO_PAYMENT": ("尚无付款", "red"),
           "BELOW_THRESHOLD": ("门槛未达", "amber"), "NO_DATA": ("未评估", "gray")}.get(funnel.get("level"),
                                                                                     (funnel.get("level"), "gray"))
     th = funnel.get("thresholds") or []
     if t2:
-        summ.append(("闸门 3 预验证", "%s（受众原话 %s · 留存动作 %s · 付费或结算 %s）" % (
+        summ.append(("红线 3 预验证", "%s（受众原话 %s · 留存动作 %s · 付费或结算 %s）" % (
             ft[0], th[0]["actual"] if th else "—", th[1]["actual"] if th else "—",
             th[2]["actual"] if th else "—"), ft[1]))
     else:
-        summ.append(("闸门 3 预验证", "%s（访谈 %s · 愿进一步 %s · 付款 %s）" % (
+        summ.append(("红线 3 预验证", "%s（访谈 %s · 愿进一步 %s · 付款 %s）" % (
             ft[0], th[0]["actual"] if th else "—", th[1]["actual"] if th else "—",
             th[2]["actual"] if th else "—"), ft[1]))
     mt = {"OK": ("可售", "green"), "INCOMPLETE": ("字段缺失", "amber"),
           "NOT_READY": ("未达可售门槛", "amber"), "NO_DATA": ("未评估", "gray")}.get(mso.get("level"),
                                                                                 (mso.get("level"), "gray"))
     _mso_field_total = len(MSU_FIELDS if t2 else MSO_FIELDS)
-    summ.append(("闸门 4 %s" % ("最小可售单元" if t2 else "最小可售 Offer"),
+    summ.append(("红线 4 %s" % ("最小可售单元" if t2 else "最小可售 Offer"),
                  "%s（标准 %s/%s · 字段 %s/%s）" % (
                      mt[0], mso.get("pass_count", 0), mso.get("total_standards", 7),
                      mso.get("field_count", _mso_field_total)
@@ -2312,7 +2312,7 @@ def render_report(cfg, mask=None):
                      mso.get("field_count", _mso_field_total)), mt[1]))
     if delivery.get("level") and delivery.get("level") != "NO_DATA":
         dt = ("通过", "green") if delivery["level"] == "PASS" else ("部分满足", "amber")
-        summ.append(("闸门 4 %s" % ("首 3 个付费单元" if t2 else "首 3 个客户"),
+        summ.append(("红线 4 %s" % ("首 3 个付费单元" if t2 else "首 3 个客户"),
                      "%s（%s/%s）" % (dt[0], delivery.get("pass_count"),
                                     delivery.get("total_checks")), dt[1]))
     if stopinfo.get("verdict") and stopinfo["verdict"] != "NO_DATA":
@@ -2332,7 +2332,7 @@ def render_report(cfg, mask=None):
         parts.append("</ul>")
     sg = res.get("scale_gate") or {}
     if sg.get("items"):
-        parts.append("<h3>扩大投入闸门（第十一章 / 第十二章）</h3>")
+        parts.append("<h3>扩大投入红线（第十一章 / 第十二章）</h3>")
         parts.append("<table><tr><th>条件</th><th class='n'>是否满足</th><th>依据</th></tr>")
         for i in sg["items"]:
             parts.append("<tr><td>%s</td><td class='n'>%s</td><td class='muted'>%s</td></tr>"
@@ -2341,7 +2341,7 @@ def render_report(cfg, mask=None):
         parts.append("</table>")
         if not sg.get("pass"):
             parts.append('<div class="quote">四项未同时满足，因此本报告不构成扩大投入或全职化的依据。'
-                         "两层闸门必须同时通过，才适合讨论扩大投入。</div>")
+                         "两层红线必须同时通过，才适合讨论扩大投入。</div>")
     if res.get("gaps"):
         parts.append("<h3>需要关注的缺口</h3><ul class='clean warn'>")
         for g in res["gaps"]:
@@ -2350,7 +2350,7 @@ def render_report(cfg, mask=None):
     parts.append("</div>")
 
     if gate1:
-        parts.append('<div class="card"><h2><span class="num">2</span>闸门 1 · 生存与合规</h2>')
+        parts.append('<div class="card"><h2><span class="num">2</span>红线 1 · 生存与合规</h2>')
         parts.append('<p class="src">出处：第二章 2.1 硬红线 · 2.2 软风险项 · 2.3 止损三数字</p>')
         parts.append("<h3>硬红线（命中即锁定，评分不可覆盖）</h3>")
         if gate1.get("redline_hits"):
@@ -2388,7 +2388,7 @@ def render_report(cfg, mask=None):
         parts.append("</div>")
 
     if score:
-        parts.append('<div class="card"><h2><span class="num">3</span>闸门 2 · OPC 适配度评分</h2>')
+        parts.append('<div class="card"><h2><span class="num">3</span>红线 2 · OPC 适配度评分</h2>')
         parts.append('<p class="src">出处：第三章 3.1 评分规则 · 3.2 评分表 · 3.3 结果解释</p>')
         parts.append("<h3>四个维度</h3><table><tr><th>维度</th><th>得分</th><th>占比</th><th></th></tr>")
         for d in score["dimensions"]:
@@ -2421,7 +2421,7 @@ def render_report(cfg, mask=None):
                      "这一条由引擎强制执行，不依赖自觉。</p>")
         parts.append("</div>")
 
-    parts.append('<div class="card"><h2><span class="num">4</span>闸门 3 · 问题与客户</h2>')
+    parts.append('<div class="card"><h2><span class="num">4</span>红线 3 · 问题与客户</h2>')
     parts.append('<p class="src">出处：第四章 4.1 方向生成 · 4.2 方向评分卡 · 4.3 筛选原则 · 第五章 5.2/5.3</p>')
     parts.append("<h3>候选方向（第四章 4.2 评分卡，权重合计 100%）</h3>")
     if direct.get("directions"):
@@ -2502,7 +2502,7 @@ def render_report(cfg, mask=None):
         parts.append("</table>")
     parts.append("</div>")
 
-    parts.append('<div class="card"><h2><span class="num">5</span>闸门 4 · 付费与交付</h2>')
+    parts.append('<div class="card"><h2><span class="num">5</span>红线 4 · 付费与交付</h2>')
     parts.append('<p class="src">出处：第六章 6.1 一页纸启动书 · 6.2 MSO 最低标准 · 第七章 7.2 首 3 个客户</p>')
     parts.append("<h3>%s</h3>" % (
         "最小可售单元最低标准（第六章 6.2）" if t2 else "MSO 最低标准（第六章 6.2）"))
@@ -2517,9 +2517,9 @@ def render_report(cfg, mask=None):
         parts.append("<p class='muted'>通过 %d / %d。</p>" % (mso["pass_count"], mso["total_standards"]))
     else:
         parts.append("<p class='muted'>%s</p>" % (
-            "未提供最小可售单元。闸门 4 需要一个范围明确、周期清楚、必须收费的最小可售单元，"
+            "未提供最小可售单元。红线 4 需要一个范围明确、周期清楚、必须收费的最小可售单元，"
             "并写明定价与分成或结算口径。" if t2
-            else "未提供 MSO。闸门 4 需要一份范围明确、周期清楚、必须收费的最小可售 Offer。"))
+            else "未提供 MSO。红线 4 需要一份范围明确、周期清楚、必须收费的最小可售 Offer。"))
     if mso.get("missing_fields"):
         parts.append("<h3>%s（第六章 6.1）</h3><ul class='clean warn'>" % (
             "最小可售单元缺失字段" if t2 else "一页纸启动书缺失字段"))
@@ -2537,7 +2537,7 @@ def render_report(cfg, mask=None):
     parts.append("</div>")
 
     if econ:
-        parts.append('<div class="card"><h2><span class="num">6</span>闸门 5 · 单位经济核算</h2>')
+        parts.append('<div class="card"><h2><span class="num">6</span>红线 5 · 单位经济核算</h2>')
         parts.append('<p class="src">出处：第六章 6.3 单位经济模型 · 第九章 9.1 经营看板</p>')
         if econ["level"] == "NO_DATA":
             parts.append("<p class='muted'>尚无交易数据，单位经济待有真实订单后回填。</p>")
@@ -2687,13 +2687,13 @@ def render_report(cfg, mask=None):
         parts.append("</div>")
 
     parts.append('<div class="card"><h2><span class="num">10</span>下一步</h2>')
-    parts.append('<p class="src">按第五道闸门之前的推进顺序排列</p>')
+    parts.append('<p class="src">按第五道红线之前的推进顺序排列</p>')
     parts.append("<ul class='clean ok'>")
     for n in res.get("next_actions") or []:
         parts.append("<li>%s</li>" % esc(n))
     parts.append("</ul>")
     parts.append("<div class='quote'>只有「真实付款 + 可控交付 + 单位经济为正 + 风险可控」同时出现时，"
-                 "才把方向视为初步验证成功。两层闸门必须同时通过，才适合扩大投入或考虑全职化"
+                 "才把方向视为初步验证成功。两层红线必须同时通过，才适合扩大投入或考虑全职化"
                  "（第十一章 / 第十二章）。</div>")
     parts.append("</div>")
 
@@ -2728,7 +2728,7 @@ def _l2_sections(payload, mask, start_num=11):
     # ── §11 模式与专属指标 ──────────────────────────────────────────
     frag = []
     if m["level"] == "BLOCKED_ORDER":
-        frag.append('<div class="verdict v-lock"><p class="lvl">第二层被顺序闸门拒绝</p>'
+        frag.append('<div class="verdict v-lock"><p class="lvl">第二层被顺序红线拒绝</p>'
                     '<p class="txt">%s</p></div>' % esc(m["reason"]))
         frag.append("<p class='muted'>%s</p>" % esc(m["detail"]))
         frag.append('<dl class="kv"><dt>前置条件</dt><dd>%s</dd><dt>下一步</dt><dd>%s</dd>'
@@ -3245,13 +3245,13 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd")
 
     for name, help_text in (
-        ("gate1", "闸门 1：硬红线、软风险、止损三数字"),
-        ("score", "闸门 2：适配度评分（含证据封顶）"),
-        ("direct", "闸门 3：方向生成校验 + 方向评分卡"),
-        ("funnel", "闸门 3：预验证门槛 + 访谈到成交漏斗"),
-        ("mso", "闸门 4：一页纸启动书 + MSO 最低标准 7 条"),
-        ("delivery", "闸门 4：首 3 个客户的验证标准"),
-        ("econ", "闸门 5：单位经济核算"),
+        ("gate1", "红线 1：硬红线、软风险、止损三数字"),
+        ("score", "红线 2：适配度评分（含证据封顶）"),
+        ("direct", "红线 3：方向生成校验 + 方向评分卡"),
+        ("funnel", "红线 3：预验证门槛 + 访谈到成交漏斗"),
+        ("mso", "红线 4：一页纸启动书 + MSO 最低标准 7 条"),
+        ("delivery", "红线 4：首 3 个客户的验证标准"),
+        ("econ", "红线 5：单位经济核算"),
         ("stop", "止损与退出监控（含替代路径）"),
         ("assay", "第一层合成结论（主命令）"),
         ("state", "读写状态档案"),
@@ -3318,7 +3318,7 @@ def main(argv=None):
         res = judge_modes(cfg)
         dump(res)
         if res["level"] == "BLOCKED_ORDER":
-            print("第二层被顺序闸门拒绝：%s" % res["next_action"], file=sys.stderr)
+            print("第二层被顺序红线拒绝：%s" % res["next_action"], file=sys.stderr)
             return RC_ORDER
         return 0
     if args.cmd == "board":
