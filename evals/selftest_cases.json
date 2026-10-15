@@ -1808,7 +1808,7 @@
    "name": "SKILL.md frontmatter 结构合法（无折行破坏 / 必需字段齐全 / 无废弃字段）",
    "kind": "frontmatter",
    "expect": {
-    "fields": 9,
+    "fields": 8,
     "problems": []
    }
   },
