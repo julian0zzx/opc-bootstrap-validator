@@ -6,7 +6,7 @@ category: business
 version: 0.8.1
 author: julian0zzx （振兴）
 tags: [一人公司, OPC, 创业自查, 最小验证, 单位经济, 模式指标, 决策书]
-license: AGPL-3.0
+license: MIT
 ---
 
 # OPC 启动验证器

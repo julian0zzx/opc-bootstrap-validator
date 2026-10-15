@@ -87,3 +87,7 @@ opc-bootstrap-validator/
 │   └── demo_input.json             完整示例输入（含 layer2）
 └── README.md
 ```
+
+## License
+
+MIT
