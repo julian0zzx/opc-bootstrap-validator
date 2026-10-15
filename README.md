@@ -7,6 +7,10 @@
 - 命名：skill 标识 `opc-bootstrap-validator`，中文显示名「OPC 启动验证器」
 - 报告名《OPC 最小验证决策书》。
 
+## 安装
+
+npx skills add julian0zzx/opc-bootstrap-validator
+
 ## 自足性与职责边界
 
 本 SKILL 完全自足，不依赖任何其他 SKILL。输入全部由自己提问收集，不读取、不修改外部产物，也不假设环境里存在任何"定方向"类的工具。
