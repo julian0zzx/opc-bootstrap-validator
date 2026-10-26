@@ -1,13 +1,28 @@
 ---
 name: opc-bootstrap-validator
+description: >-
+  Assess an OPC startup direction through a structured personal inventory and
+  evidence-based validation. Apply five business gates, distinguish
+  sales-driven and distribution-driven paths, detect weak validation signals,
+  calculate unit economics, and match the direction to relevant business
+  metrics. Use when evaluating an OPC idea, customer demand, readiness to go
+  full time, profitability, business model, or whether to continue, adjust, or
+  pause.
+license: MIT
 display_name: OPC 启动验证器
-description: Structured self-check and minimum-validation assessment for an OPC. Start with a Level 0 personal inventory (time / existing assets / deal-breakers / delivery format), then follow two equivalent validation paths based on the direction's transaction model: sales-driven or distribution-driven. The first layer checks evidence step by step across five common gates (survival & stop-loss / capability & resources / problem & customer / pricing & delivery / unit economics), with hard red lines locking the conclusion; unsupported self-ratings are capped at 2 points by the code, and fake validation signals (launches, follower growth, readership, orders, sales) are blocked and replaced with verifiable metrics. The second layer classifies the direction into 8 categories / 69 patterns based on the primary revenue source + primary risk source and matches each with a dedicated indicator package, producing a five-slot merged dashboard of 'North Star 1 + Process 2 + Safety 2' with continue / adjust / pause decisions; the two layers are ANDed. It outputs a neutral HTML decision memo for personal use or external delivery. Use when a user wants to self-check a startup direction, decide whether they can quit their job to go full-time, calculate customer-level economics, decide whether 'people are interested' counts as validation, request an OPC fit score, ask 'what mode is this,' 'which metrics should I track,' or 'should I continue or adjust this month.'
-description_cn: 为一人公司（OPC）创始人的创业方向做结构化的自查与最小验证判定。开场先做第 0 层当事人盘点（时间 / 已有资产 / 排斥项 / 交付形态），再按方向的交易形态分「销售驱动」与「分发驱动」两条等价验证路径。第一层按五道通用红线（生存与止损 / 能力与资源 / 问题与客户 / 付费与交付 / 单位经济）逐级核对证据，硬红线命中即锁定，无证据的自我评分由代码封顶 2 分，伪验证信号（上线、涨粉、阅读量、订单、销售额）被拦截并强制替换为可验证指标。第二层按「主要收入来源 + 主要风险来源」把方向归入 8 类 / 69 种模式并匹配其专属指标包，产出「北极星 1 + 过程 2 + 安全 2」五槽位合并看板与继续/调整/暂停决策；两层是 AND 关系。产出中性的 HTML 决策书，可用于自用或对外交付。当用户想做创业方向自查、判断能不能辞职全职、核算单客经济、判别「有人感兴趣」是否等于已验证、询问 OPC 适配度评分、问「我这算什么模式」「该盯哪些指标」或「这个月该继续还是调整」时使用。
+description_cn: >-
+  为一人公司（OPC）创始人的创业方向做结构化的自查与最小验证判定。
+  开场先做第 0 层当事人盘点（时间 / 已有资产 / 排斥项 / 交付形态），再按方向的交易形态分「销售驱动」与「分发驱动」两条等价验证路径。
+  第一层按五道通用红线（生存与止损 / 能力与资源 / 问题与客户 / 付费与交付 / 单位经济）逐级核对证据，
+  硬红线命中即锁定，无证据的自我评分由代码封顶 2 分，伪验证信号（上线、涨粉、阅读量、订单、销售额）被拦截并强制替换为可验证指标。
+  第二层按「主要收入来源 + 主要风险来源」把方向归入 8 类 / 69 种模式并匹配其专属指标包，产出「北极星 1 + 过程 2 + 安全 2」五槽位合并看板与继续/调整/暂停决策；
+  两层是 AND 关系。
+  产出中性的 HTML 决策书，可用于自用或对外交付。
+  当用户想做创业方向自查、判断能不能辞职全职、核算单客经济、判别「有人感兴趣」是否等于已验证、询问 OPC 适配度评分、问「我这算什么模式」「该盯哪些指标」或「这个月该继续还是调整」时使用。
 category: business
-version: 0.8.1
+version: 0.9.0
 author: julian0zzx （振兴）
 tags: [一人公司, OPC, 创业自查, 最小验证, 单位经济, 模式指标, 决策书]
-license: MIT
 ---
 
 # OPC 启动验证器
@@ -17,7 +32,7 @@ license: MIT
 1. **这个方向能不能开始？**（第一层 · 五道通用红线）
 2. 这种模式是否出现了该模式应有的真实增长信号？（第二层 · 模式专属指标）
 
-当前版本 v0.8.1，两层红线已全部实现：第一层五道通用红线，第二层模式专属指标与合并看板。
+当前版本 v0.9.0，两层红线已全部实现：第一层五道通用红线，第二层模式专属指标与合并看板。
 
 第一层按五道红线逐级 AND 判定：任何一道红线缺证据，结论都会被压到 `CONDITIONAL` 以下。评分只能往下压，不能往上抬。
 
