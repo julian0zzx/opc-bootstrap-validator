@@ -3094,7 +3094,7 @@
   },
   {
    "id": "TR-10",
-   "name": "路径只有两条：旧配置里的 T3 归一成 T2，不报错也不回退最严路径",
+   "name": "路径只有两条：旧配置里的 T3 归一成 T2，不报错也不回退默认路径",
    "kind": "track",
    "config": {
     "track": {
@@ -3115,6 +3115,70 @@
     "source": "explicit",
     "aliased_from": "T3",
     "label": "分发驱动"
+   }
+  },
+  {
+   "id": "TR-11",
+   "name": "路径按晋级方向判：主方向 T1 带评分、副方向含 T2 词，必须判 T1（不得被副方向拖走）",
+   "kind": "track",
+   "config": {
+    "gate3": {
+     "directions": [
+      {
+       "name": "帮跨境小卖家整理客服知识库与回复模板",
+       "basis": "past_results",
+       "scores": {
+        "pain_intensity": 4,
+        "paid_proof": 3,
+        "reachability": 4,
+        "measurability": 4,
+        "delivery_control": 4,
+        "unit_econ": 3,
+        "repeat_referral": 3,
+        "compliance_dependency": 4,
+        "founder_durability": 4
+       }
+      },
+      {
+       "name": "顺手在网文平台连载短篇",
+       "basis": "referrals"
+      }
+     ]
+    }
+   },
+   "expect": {
+    "key": "T1",
+    "source": "inferred",
+    "pool.source": "hard_floor",
+    "pool.used": 1,
+    "pool.total": 2
+   }
+  },
+  {
+   "id": "TR-12",
+   "name": "路径按晋级方向判：advanced 显式标记优先于关键词与硬约束",
+   "kind": "track",
+   "config": {
+    "gate3": {
+     "directions": [
+      {
+       "name": "帮跨境小卖家整理客服知识库",
+       "basis": "past_results",
+       "advanced": true
+      },
+      {
+       "name": "顺手在网文平台连载短篇",
+       "basis": "referrals",
+       "advanced": false
+      }
+     ]
+    }
+   },
+   "expect": {
+    "key": "T1",
+    "pool.source": "advanced",
+    "pool.used": 1,
+    "pool.total": 2
    }
   },
   {
@@ -3348,6 +3412,126 @@
    }
   },
   {
+   "id": "AU-04",
+   "name": "路径未固化：判成 T2 但只擦边命中 1 个关键词，且已收 T2 证据，给 track_unpinned",
+   "kind": "audit",
+   "config": {
+    "gate3": {
+     "directions": [
+      {
+       "name": "悬疑短篇连载",
+       "basis": "past_results"
+      }
+     ],
+     "funnel": {
+      "units_listed": 20,
+      "exposures": 9000,
+      "engaged": 120,
+      "voices": 14,
+      "payers": 3,
+      "deliveries": 18,
+      "results": 4
+     }
+    }
+   },
+   "expect": {
+    "level": "WARN",
+    "warn_count": 1,
+    "issues.0.code": "track_unpinned",
+    "issues.0.severity": "warn"
+   }
+  },
+  {
+   "id": "AU-05",
+   "name": "路径固化后不再提示：同一份数据写进 track.key=T2 即静默",
+   "kind": "audit",
+   "extends": "AU-04",
+   "patch": {
+    "track": {
+     "key": "T2"
+    }
+   },
+   "expect": {
+    "level": "OK",
+    "warn_count": 0
+   }
+  },
+  {
+   "id": "AU-06",
+   "name": "一页纸填错套：T2 路径下整份填的是 MSO 字段，报 track_fields 而不是静默缺 7 项",
+   "kind": "audit",
+   "config": {
+    "track": {
+     "key": "T2"
+    },
+    "gate4": {
+     "mso": {
+      "target_customer": "跨境小卖家",
+      "scenario": "旺季",
+      "pain": "客服重复",
+      "loss": "浪费工时",
+      "min_result": "知识库",
+      "deliverables": "文档",
+      "exclusions": "不含对接",
+      "client_inputs": "聊天记录",
+      "cycle_days": 7,
+      "acceptance": "覆盖 80%",
+      "price_terms": "定金 变更 延期 退款 保密 成果归属 售后",
+      "why_me": "经验",
+      "channel_actions": "知乎",
+      "direct_cost": "300",
+      "delivery_hours": "12 小时",
+      "gross_profit": "4400",
+      "risks": "个人信息",
+      "stop_loss": "2000",
+      "goal_90d": "3 客户",
+      "price": 8000
+     }
+    }
+   },
+   "expect": {
+    "level": "WARN",
+    "warn_count": 1,
+    "issues.0.code": "track_fields"
+   }
+  },
+  {
+   "id": "AU-07",
+   "name": "一页纸填对套：T2 路径下填 MSU 字段不误报",
+   "kind": "audit",
+   "extends": "AU-06",
+   "patch": {
+    "gate4": {
+     "msu": {
+      "target_audience": "悬疑短篇读者",
+      "consumption_scene": "通勤碎片时间",
+      "unmet_need": "更新不稳定",
+      "no_solution_loss": "弃书",
+      "min_unit": "3 章",
+      "deliverables": "正文",
+      "exclusions": "不含有声",
+      "source_rights": "原创",
+      "cycle_days": 7,
+      "acceptance": "按时更新",
+      "price_terms": "版权 授权 分成 更新 退款 数据 售后",
+      "why_me": "产能稳定",
+      "channel_actions": "番茄小说",
+      "direct_cost": "200",
+      "unit_hours": "6 小时",
+      "gross_profit": "800",
+      "risks": "平台依赖",
+      "stop_loss": "3000",
+      "goal_90d": "1000 追读",
+      "price": 9.9
+     }
+    }
+   },
+   "expect": {
+    "level": "OK",
+    "warn_count": 0
+   }
+  },
+  {
    "id": "PB-01",
    "name": "追问清单：矛盾优先于证据缺口，且按优先级排序",
    "kind": "probe",
@@ -3390,6 +3574,35 @@
    },
    "expect": {
     "rules": 3,
+    "missing": []
+   }
+  },
+  {
+   "id": "DC-05",
+   "name": "路径分叉的四条约束写死在文档里：固化 track.key / 填错套要报 / 两条路非松紧两档 / T2 字段口径",
+   "kind": "docs_contains",
+   "groups": {
+    "SKILL.md": [
+     "确认后必须固化",
+     "track_unpinned",
+     "整份填错套",
+     "不是松紧两档",
+     "不是客户数",
+     "只有还能做的方向参与路径判定",
+     "advanced"
+    ],
+    "references/提问脚本.md": [
+     "念完就把路径写进输入 JSON",
+     "已结算单元数",
+     "不是因为它更严",
+     "路径按晋级方向判，不是按全部方向判"
+    ],
+    "README.md": [
+     "不是它更严"
+    ]
+   },
+   "expect": {
+    "rules": 12,
     "missing": []
    }
   }

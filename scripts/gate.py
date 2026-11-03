@@ -295,7 +295,10 @@ TRACKS = [
 # 第 0 层自述的交付形态 → 验证路径（仅在方向关键词无命中时生效）
 FORM_TO_TRACK = {"内容": "T2", "产品": "T2", "实物": "T2", "服务": "T1", "混合": "T2"}
 
-TRACK_DEFAULT = "T1"       # 拿不准时走最严的一条路：T1 的门槛一项都不放松
+# 拿不准时默认 T1。注意这不等于「T1 更严」——两条路是不同的证据载体，不是松紧两档：
+# T2 要求 ≥30 人留存动作，绝对数比 T1 的 3 人还高一个量级。默认 T1 的理由是
+# 「先证明有人肯为你这个人付钱」比先看流量更可靠，而不是门槛高低。
+TRACK_DEFAULT = "T1"
 TRACK_PAYER_KEY = "payers"  # 两条路径的强验证入口同名，两种输入写法都读得到
 
 # 验证路径只有两条：T1 销售驱动 / T2 分发驱动（v0.8.0 起）。
@@ -309,6 +312,35 @@ TRACK_ALIASES = {"T3": "T2"}     # 旧配置/旧状态档案里的 T3 归一成 
 def is_dist_track(tk):
     """True 表示该路径按分发驱动的证据载体判定（T2；T3 作为历史别名同样为 True）。"""
     return str((tk or {}).get("key") or "").strip().upper() in TRACK_DIST_KEYS
+
+
+def _track_pool(dirs):
+    """挑出真正参与路径判定的候选方向。
+
+    3-3 一次产出 3–5 个候选方向，3-4 用三项硬约束把不合格的划掉，3-5 只对晋级的评分。
+    如果拿**全部**方向去算关键词，一个顺手的副方向就能把整份配置拖到另一边——实测
+    「客服知识库代运营 + 顺手做个播客」会被判成分发驱动，主方向从此收错整套证据
+    （T2 问上架单元与曝光，T1 要访谈与报价）。
+
+    三层挑法，取到为止：
+      1. `advanced: true` —— 宿主显式指定晋级方向，最可靠；
+      2. 三项硬约束（合规依赖 / 可触达性 / 交付可控）都填了且都 ≥3 —— 3-4 的产物；
+      3. 全量 —— 早期配置还没有评分，保持旧行为。
+    """
+    if not dirs:
+        return [], "empty"
+    marked = [d for d in dirs if d.get("advanced") is True]
+    if marked:
+        return marked, "advanced"
+    scored = []
+    for d in dirs:
+        sc = d.get("scores") or {}
+        vals = [num(sc.get(k)) for k in DIRECTION_HARD_FLOOR]
+        if all(v is not None and v >= DIRECTION_FLOOR for v in vals):
+            scored.append(d)
+    if scored:
+        return scored, "hard_floor"
+    return dirs, "all"
 
 # 分发驱动的漏斗六环节 · 第十二章 12.1 红线 3/4/5 的可核查对象
 FUNNEL_STAGES_T2 = [
@@ -352,6 +384,15 @@ MSU_FIELDS = [
 
 MSU_PRICE_FIELD = ("price", "定价（数值）")
 MSU_REQUIRED = MSU_FIELDS + [MSU_PRICE_FIELD]
+
+# 两套一页纸各自独有的键。另有 12 个同名键共用（deliverables / exclusions / cycle_days /
+# acceptance / price_terms / why_me / channel_actions / direct_cost / gross_profit /
+# risks / stop_loss / goal_90d），所以填错套时引擎不会报错，只会显示「缺 7 项」——
+# 宿主容易读成「还有 7 项没问」，实际是整套字段口径不对。judge_audit 用这两个表来识别。
+MSO_ONLY_KEYS = ("target_customer", "scenario", "pain", "loss", "min_result",
+                 "client_inputs", "delivery_hours")
+MSU_ONLY_KEYS = ("target_audience", "consumption_scene", "unmet_need", "no_solution_loss",
+                 "min_unit", "source_rights", "unit_hours")
 
 # 分发驱动的书面约定 7 项 · 第六章 6.2 第 7 条的等价表
 CONTRACT_TERMS_T2 = ["版权", "授权", "分成", "更新", "退款", "数据", "售后"]
@@ -995,11 +1036,14 @@ def resolve_track(cfg):
 
     by_key = {k: (label, desc) for k, label, desc, _kw in TRACKS}
     g3 = cfg.get("gate3") or {}
-    dirs = g3.get("directions") or []
+    dirs = [d for d in (g3.get("directions") or []) if isinstance(d, dict)]
+    pool, pool_src = _track_pool(dirs)
     text = " ".join("%s %s" % ((d or {}).get("name") or "", (d or {}).get("notes") or "")
-                    for d in dirs if isinstance(d, dict))
+                    for d in pool)
     form = str((cfg.get("profile") or {}).get("delivery_form") or "").strip()
     text = text + " " + form
+    pool_info = {"source": pool_src, "used": len(pool), "total": len(dirs),
+                 "names": [d.get("name") or "" for d in pool]}
 
     hist = {}
     for key, _label, _desc, kws in TRACKS:
@@ -1018,7 +1062,8 @@ def resolve_track(cfg):
                 "source": "explicit", "confidence": "high",
                 "reason": why or "宿主据候选方向的交易特征确认",
                 "aliased_from": raw_key if key != raw_key else None,
-                "hits": hist, "equiv": [{"stage": a, "t1": b, "t2": c} for a, b, c in TRACK_EQUIV],
+                "hits": hist, "pool": pool_info,
+                "equiv": [{"stage": a, "t1": b, "t2": c} for a, b, c in TRACK_EQUIV],
                 "note": note,
             }
 
@@ -1034,12 +1079,18 @@ def resolve_track(cfg):
         key, conf = TRACK_DEFAULT, "low"
 
     label, desc = by_key[key]
+    hit_txt = ("、".join("%s %d" % (k, v) for k, v in sorted(hist.items()) if v)
+               or "无关键词命中，按 T1 默认")
+    if pool_src == "all":
+        reason = "按候选方向与交付形态的关键词判定（命中 %s）" % hit_txt
+    else:
+        reason = "按晋级方向 %d/%d 个的关键词判定（命中 %s）" % (len(pool), len(dirs), hit_txt)
     return {
         "key": key, "label": label, "desc": desc,
         "source": "inferred", "confidence": conf,
-        "reason": "按候选方向与交付形态的关键词判定（命中 %s）" % (
-            "、".join("%s %d" % (k, v) for k, v in sorted(hist.items()) if v) or "无，按最严路径默认"),
-        "hits": hist, "equiv": [{"stage": a, "t1": b, "t2": c} for a, b, c in TRACK_EQUIV],
+        "reason": reason,
+        "hits": hist, "pool": pool_info,
+        "equiv": [{"stage": a, "t1": b, "t2": c} for a, b, c in TRACK_EQUIV],
         "note": TRACK_NOTE,
     }
 
@@ -1499,6 +1550,40 @@ def judge_audit(cfg):
         add("track_fields", "warn",
             "验证路径是销售驱动，但漏斗填的是分发驱动字段",
             "改用 targets / reached / interviews / advanced / proposals / quotes / payers / payments / deliveries / results")
+
+    # 一页纸填错了口径：本路径那套是空的，字段却写到了对面去。
+    # 两套有 12 个同名键，引擎不会报错，只显示「缺 7 项」——宿主会读成
+    # 「还有 7 项没问」，实际是整套口径不对，问多少遍都填不满。
+    g4 = cfg.get("gate4") or {}
+    offer = g4.get("msu" if t2 else "mso")
+    want_keys = MSU_ONLY_KEYS if t2 else MSO_ONLY_KEYS
+    other_keys = MSO_ONLY_KEYS if t2 else MSU_ONLY_KEYS
+    if not isinstance(offer, dict) or not offer:
+        alt = g4.get("mso" if t2 else "msu")
+        if isinstance(alt, dict) and alt:
+            offer = alt
+    if isinstance(offer, dict) and offer:
+        n_want = sum(1 for k in want_keys if not blank(offer.get(k)))
+        n_other = sum(1 for k in other_keys if not blank(offer.get(k)))
+        if n_other >= 3 and n_other > n_want:
+            add("track_fields", "warn",
+                "验证路径是%s，但一页纸填的是「%s」的字段口径"
+                "（命中 %d 个对方专属字段，本方只填了 %d 个）"
+                % (tk.get("label") or tk.get("key"),
+                   "销售驱动 MSO" if t2 else "分发驱动 MSU", n_other, n_want),
+                "改用 %s" % (" / ".join(MSU_ONLY_KEYS) if t2 else " / ".join(MSO_ONLY_KEYS)))
+
+    # 路径没固化：判成 T2 但只擦了 1 个分发关键词。
+    # resolve_track 每次调用都按当前 directions 重算，不缓存也不写回；这种擦边判定
+    # 只要方向改一次名就会翻回 T1，而 T1 读 interviews/advanced、T2 读 exposures，
+    # 两边字段不通用——已收的漏斗数字会整批作废。要求宿主把 track.key 固化进配置。
+    if t2 and tk.get("source") != "explicit":
+        hits = tk.get("hits") or {}
+        if hits.get("T2") == 1 and (t2_present or bool((cfg.get("gate4") or {}).get("msu"))):
+            add("track_unpinned", "warn",
+                "验证路径「T2」是引擎按关键词推断的，且只擦边命中 1 个分发驱动关键词；"
+                "候选方向一旦改名或增删，路径可能翻回销售驱动",
+                "把 \"track\": {\"key\": \"T2\"} 写进输入 JSON 固化，再继续收证据")
 
     # 评分里声称收过款，但漏斗和订单里一笔付款都没有
     items = (cfg.get("score") or {}).get("items") or {}
@@ -2618,9 +2703,11 @@ def render_report(cfg, mask=None):
             if prof.get("exclusions"):
                 bits.append("排除项：%s" % prof["exclusions"])
             summ.append(("当事人盘点", " · ".join(bits) or "已记录，不参与评分", "gray"))
-    summ.append(("验证路径", "%s %s（%s）" % (
-        tk.get("key"), tk.get("label"),
-        {"explicit": "已确认", "inferred": "据方向判定"}.get(tk.get("source"), "默认最严")), "gray"))
+    _pool = tk.get("pool") or {}
+    _src_txt = {"explicit": "已确认", "inferred": "据方向判定"}.get(tk.get("source"), "默认 T1")
+    if tk.get("source") != "explicit" and _pool.get("source") in ("advanced", "hard_floor"):
+        _src_txt += " · 路径按晋级方向 %d/%d 个判定" % (_pool.get("used", 0), _pool.get("total", 0))
+    summ.append(("验证路径", "%s %s（%s）" % (tk.get("key"), tk.get("label"), _src_txt), "gray"))
     if gate1:
         lv = gate1.get("level")
         tag = {"CLEAR": ("未命中", "green"), "SOFT_ALERT": ("软风险超限", "amber"),
@@ -3320,7 +3407,7 @@ def template():
                                 "evidence": {f: (None if f == "amount" else "") for f, _l in EVIDENCE_FIELDS}}
                             for k, _d, _t2, _w in SCORE_ITEMS}},
         "gate3": {
-            "directions": [{"name": "", "basis": "past_results",
+            "directions": [{"name": "", "basis": "past_results", "advanced": False,
                             "scores": {k: None for k, _l, _w, _q in DIRECTION_ITEMS},
                             "notes": ""}],
             "funnel": {"targets": None, "reached": None, "interviews": None, "advanced": None,

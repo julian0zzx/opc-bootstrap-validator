@@ -94,7 +94,7 @@ python3 scripts/gate.py <command> [args]
 | `modes --config c.json` | 第二层：模式归类（8 类 / 69 模式）+ 取出 29 个指标包之一，含叠加包 |
 | `board --config c.json [--out 看板.html]` | 第二层：合并看板（五槽位 + 通用 6 类 + 9.2 决策 + 记录格式） |
 | `template --out c.json` | 生成空白输入模板 |
-| `selftest` | 判据回归自检（68 项：5 项 HTML 渲染 + 1 项全库版本一致性 + 1 项 frontmatter 结构 + 1 项提问节奏约束 + 1 项模板骨架可填满 + 1 项证据分级 + 3 项数据自洽 + 1 项追问排序 + 1 项证据卡策略锁定 + 2 项字段口径（`price` 计入必填，共 20 项），幂等） |
+| `selftest` | 判据回归自检（75 项：5 项 HTML 渲染 + 1 项全库版本一致性 + 1 项 frontmatter 结构 + 1 项提问节奏约束 + 1 项模板骨架可填满 + 1 项证据分级 + 3 项数据自洽 + 1 项追问排序 + 1 项证据卡策略锁定 + 2 项字段口径（`price` 计入必填，共 20 项）+ 2 项路径固化 + 2 项一页纸填错套 + 2 项晋级方向优先 + 1 项分叉约束文档锁定，幂等） |
 | `version` | 版本信息 |
 
 **退出码**：`0` 成功 · `1` 自检有失败用例 · `2` 输入错误 · `4` 第二层被顺序红线拒绝（没有合格候选方向）。
@@ -217,7 +217,7 @@ python3 scripts/gate.py <command> [args]
 
 候选方向必须写成"客户人群 + 场景 + 结果 + 交付形式"。不合格的例子："AI 咨询" / "代运营" / "内容创作"，引擎会标"命名待改"。每个方向记 `basis`：`past_results` / `referrals` / `market_gap` / `fast_deliverable`。
 
-- `gate3.directions[]`：每个方向填 `name` / `basis` / `scores`（9 项）
+- `gate3.directions[]`：每个方向填 `name` / `basis` / `advanced` / `scores`（9 项）——`advanced: true` 表示这条是晋级方向，只有带标记（或过了硬约束）的方向参与路径判定
 - `gate3.funnel`：`targets` / `reached` / `interviews` / `advanced` / `proposals` / `quotes` / `payers` / `payments` / `deliveries` / `results`
 - `gate3.funnel.loss_reasons{}`：收不到款时按 6 类归因，不得直接得出"市场不存在"（容错：写成上层 `gate3.loss_reasons` 或顶层 `loss_reasons` 也读得到）
 
@@ -230,17 +230,21 @@ python3 scripts/gate.py <command> [args]
 | `T1` 销售驱动 | 单客户或少数客户、客单价高、需要提案谈判 | 顾问、代运营、定制开发、B2B 服务 | 访谈到成交的八环节漏斗 + 一页纸 MSO 20 个必填项 |
 | `T2` 分发驱动 | 大量匿名受众、客单价低、靠平台分发累积 | 网文、新媒体、短剧、数字产品、独立 App / SaaS、独立站 | 内容到结算的六环节漏斗 + 最小可售单元 20 个必填项 |
 
-判定由 `assay` 按候选方向与 `profile.delivery_form` 自动完成，宿主念一句确认即可：
+判定按**晋级方向**的关键词算，不是全部候选方向。3-3 一次给出 3–5 个方向，3-4 用三项硬约束把不合格的划掉；**只有还能做的方向参与路径判定**——否则一个顺手的副方向就能把主方向拖到另一条路上，后面整套证据全收错（T2 问上架单元与曝光，T1 要访谈与报价）。
+
+取值顺序（取到为止）：① `directions[].advanced = true` 的显式标记；② 三项硬约束（合规依赖 / 可触达性 / 交付可控）都填了且都 ≥3 分的；③ 都没有时退回全部候选方向（早期配置还没评分）。零命中时才用 `profile.delivery_form` 兜底（`服务→T1`，`内容 / 产品 / 实物 / 混合→T2`）。宿主念一句确认即可：
 
 > 这条方向我按「分发驱动」来验：看的是上架单元、留存动作和付费结算，不是客户访谈和报价。要改成按客户谈的那条路吗？
 
-**四条硬规则**：① 拿不准一律走 `T1`（门槛最严的一条）；② 付费或结算人数两条路径都要求 ≥1，**不放宽**；③ 绝对化表述、平台依赖、素材授权等检查一条不少；④ 用户不认同判定时可以改（写进 `track.key`），但改成哪条都要满足那条路径的门槛。
+**四条硬规则**：① 拿不准就按**获客通道**判：被匿名受众通过内容或产品找到你 → `T2`；靠自己一个个去谈 → `T1`。判不出来时默认 `T1`，理由是"先证明有人肯为你这个人付钱"比先看流量可靠——**不是"T1 更严"**：两条路是不同的**证据载体**，不是松紧两档，`T2` 要求 ≥30 人留存动作，绝对数比 `T1` 的 3 人还高一个量级；② 付费或结算人数两条路径都要求 ≥1，**不放宽**；③ 绝对化表述、平台依赖、素材授权等检查一条不少；④ 用户不认同判定时可以改（写进 `track.key`），但改成哪条都要满足那条路径的门槛。
+
+**确认后必须固化**：不管用户认不认同，都要把 `"track": {"key": "T1"}`（或 `"T2"`）写进输入 JSON。引擎每次调用都按当前 `gate3.directions` 重算路径，不缓存也不写回——**不固化的话，后面只要改一次方向名，路径就可能翻转，已经按旧路径收的漏斗数字和一页纸会整批作废**（`T1` 读 `interviews` / `advanced`，`T2` 读 `exposures` / `engaged`，两套字段不通用，翻过去以后一边全空）。`audit` 报 `track_unpinned` 就是在提醒这件事：判成了 `T2`，但只擦边命中 1 个分发关键词。
 
 **验证路径只有两条**（`T1` / `T2`）。**混合形态**（内容或产品获客、再以服务或商品变现）按**获客通道**归入 `T2`——获客端本来就是分发驱动，判据与纯分发完全一致，变现端是服务、商品还是订阅都不改变任何阈值。旧写法里的 `T3` 会被自动归一成 `T2`。
 
 `T2` 的输入字段与 `T1` 并存，按路径各取一套：
 
-- `gate3.funnel`（`T2`）：`units_listed` / `exposures` / `engaged` / `voices` / `payers` / `deliveries` / `results`
+- `gate3.funnel`（`T2`）：`units_listed` / `exposures` / `engaged` / `voices` / `payers` / `deliveries` / `results`。其中 `voices`（目标受众原话条数）**只进红线 3 的门槛判定**（≥10 条），不出现在六环节表里——它不是流转环节，是证据条数，所以漏斗表里看不到它但门槛表里有
 - `gate4.msu`（`T2`）：最小可售单元 20 个必填项 = 19 个文本字段 + `price` 数值项（`cycle_days` 已在 19 个文本字段内，但必须填纯数字；写成 `gate4.mso` 也认）
 - `track`：`{"key": "T1|T2", "reason": "…"}`，留空则由引擎按方向判定。写成旧的 `"T3"` 会被归一成 `"T2"`
 
@@ -254,7 +258,7 @@ python3 scripts/gate.py <command> [args]
 
 - 4-1 … 4-6：`gate4.mso.*` 20 个必填项，第 4 条必须收费，价格为 0 即不通过；`price` 未填计入缺失字段（报告显示「字段 19/20」）
 - **`price` 是数值项**（纯数字，如 `8000`），与 `cycle_days` 一样必须能被解析成数字；「8000 元」「8k」写进去会被判「无法解析为数字」。价格条款（定金 / 变更 / 退款 / 保密 / 成果归属 / 售后）另放在文本字段 `price_terms` 里。`template` 生成的骨架已含 `price` 占位。
-- 4-7（清单式 1 问）：`gate4.delivery.*` —— `paying_customers` / `scope_controlled` / `econ_positive` / `feedback` / `follow_ons` / `compliant` / `still_willing` 7 条
+- 4-7（清单式 1 问）：`gate4.delivery.*` —— `paying_customers` / `scope_controlled` / `econ_positive` / `feedback` / `follow_ons` / `compliant` / `still_willing` 7 条。**`T2` 下字段名不变，口径变**：`paying_customers` 填「已结算的**单元数**」（不是客户数）、`follow_ons` 填「复购 / 追更 / 续订的单元数」，判据文案同步换成单元口径
 - 4-8：`tracking` —— 现金已投入 / 上限、已试跑周数 / 上限，加上本轮改变了哪 1–2 个变量、有没有收到钱
 
 出现绝对化表述（保证 / 确保 / 一定能 / 100% / 零风险…）会被直接判第 6 条不通过，必须改成"客户结果描述"。
@@ -265,6 +269,8 @@ python3 scripts/gate.py <command> [args]
 
 问是否有真实订单。有 → 收集 `revenue` / `direct_cost` / `hours`，连同目标时薪、获客成本（`cac`）与单客月贡献利润（用于算回本周期），**每轮不超过 3 个数字**。
 没有订单也不算失败：留空即可，引擎输出 `NO_DATA` 且不阻塞（文档允许早期无交易）。
+
+`T2` 下用**同一套字段**，只是换读法：`cac` 理解成"摊到一个付费单元上的获客成本"，`monthly_contribution_per_customer` 理解成"单单元月贡献利润"，回本口径显示为「**单元**回本周期」。**算法与 `T1` 完全一致**（`judge_econ` 只换标签不换公式），因为两条路径在这里核算的都是"卖出一个单位要多久回本"，差别只在分母叫什么。
 
 ### 第 6 步：信号真实性检查（不单独占轮）
 
@@ -281,6 +287,8 @@ python3 scripts/gate.py probe --config opc_input.json   # 下一轮该问什么
 
 - `audit` **INCONSISTENT**：有物理上不可能的数字（例如触达 0 却访谈了 14 人）。当场核对，**不得带着矛盾继续往下走**；改完重跑。
 - `audit` **WARN**：口径可能不同（一人多案、分期付款、按单元交付），问一句确认即可。
+- `audit` 报 `track_fields` 且文案是"一页纸填的是「XX」的字段口径"：**这不是缺字段，是整份填错套**。两套一页纸有 12 个同名键（`deliverables` / `exclusions` / `cycle_days` / `acceptance` / `price_terms` / `why_me` / `channel_actions` / `direct_cost` / `gross_profit` / `risks` / `stop_loss` / `goal_90d`），所以 `mso` 只会显示"缺 7 项"，宿主容易读成"还有 7 项没问"。必须换整套字段重填，不要照着缺失清单补。
+- `audit` 报 `track_unpinned`：验证路径还没固化，见第 3 步 3-3b。
 - `probe` 返回的清单**按顺序问、每轮最多 3 条**（R1）。答完把结果写回证据卡与漏斗，再跑 `assay`，**不要自己判断"证据够了"**。
 
 这三个命令构成 v0.10 的分工：**AI 负责把话说清楚、把要素抽出来、照着清单去问；够不够、对不对，由代码说。**
@@ -355,6 +363,7 @@ python3 scripts/gate.py report --config opc_input.json --out OPC决策书.html -
 | `SCORE_ITEMS`（16 项 / 满分 100） | 第三章 3.2 |
 | `EVIDENCE_FIELDS`（证据卡 5 要素）+ `EVIDENCE_CAP`（L0–L4 → 2/3/3/4/5） | 第三章 3.1 证据门槛的细化 |
 | `AUDIT_CHAIN_T1` / `AUDIT_CHAIN_T2`（每条边标 block 或 warn） | 第五章 5.3 漏斗 / 第十二章 12.1 |
+| `MSO_ONLY_KEYS` / `MSU_ONLY_KEYS`（各 7 个专属键，其余 12 个同名） | 第六章 6.1 两套一页纸的口径区分 |
 | `PROBE_LIMIT = 12` + `judge_probe` 的排序 | 第四章 4.0 提问节奏（每轮 ≤3 问） |
 | `NO_EVIDENCE_CAP = 2` | 第三章 3.1 |
 | 分档 80 / 60 | 第三章 3.3 |
@@ -408,11 +417,11 @@ python3 scripts/gate.py report --config opc_input.json --out OPC决策书.html -
 | 有收入无工时 | `INCOMPLETE`，**拒答**，不给单位经济数字 |
 | 用户描述含伪验证信号 | `BLOCKED`，当场替换为可验证指标再问 |
 | 未提供 `profile` | 不阻塞。方向生成只能依赖红线 3 的四类证据，报告标注「未盘点」 |
-| 验证路径判定拿不准 | 默认 `T1`（门槛最严），报告标注「默认最严」 |
+| 验证路径判定拿不准 | 默认 `T1`（先证明有人肯为你这个人付钱），报告标注「默认 T1」 |
 | `T2` 只报了曝光 / 阅读量 | 留存动作与付费仍为空，`funnel` 判 `NO_PAYMENT`，结论压到 `CONDITIONAL` |
 | 用 `T1` 字段填 `T2` 的单元 | 按 `MSU_FIELDS` 报出缺失字段，MSO 判 `INCOMPLETE` |
 | 方向是混合形态（内容 / 产品获客 + 服务 / 商品变现） | 按**获客通道**归入 `T2`，报告中并列展示 `T1` 等价项；变现端是什么都不改阈值 |
-| 旧配置 / 旧档案里写着 `track.key = "T3"` | 归一成 `T2`，不报错，也不回退到最严路径（`TRACK_ALIASES`） |
+| 旧配置 / 旧档案里写着 `track.key = "T3"` | 归一成 `T2`，不报错，也不回退到默认路径（`TRACK_ALIASES`） |
 | 用户自行指定 `track` | 以用户为准（`track.key`），但两条路径的门槛都不放松 |
 | 结论为 `LOCKED` | 报告仍生成，但宿主不得同时展示高分作为安慰 |
 | 用户要求"给我个好结论" | 拒绝。引擎没有这个分支，宿主也不得手工上调任何分数或档位 |

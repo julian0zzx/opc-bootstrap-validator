@@ -207,6 +207,7 @@
       {
         "name": "",
         "basis": "past_results",
+        "advanced": false,
         "scores": {
           "pain_intensity": null,
           "paid_proof": null,
