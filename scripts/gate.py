@@ -23,9 +23,13 @@ import re
 import shutil
 import sys
 
-VERSION = "0.9.0"
+VERSION = "0.10.0"
 ENGINE = "opc-bootstrap-validator"
 SCHEMA = "opc-bootstrap-validator/1"
+
+# 本次读入的配置路径。状态档案默认落在它旁边，而不是 cwd——
+# SKILL.md 让宿主先 cd 进 skill 目录再跑命令，落在 cwd 会写进安装目录。
+_CONFIG_PATH = None
 
 # ══════════════════════════════════════════════════════════════════
 # 判据常量（出处见 references/方法论全文.md，章节号对应 SKILL.md 对照表）
@@ -101,6 +105,71 @@ SCORE_LEVELS = [
 ]
 
 NO_EVIDENCE_CAP = 2          # 第三章 3.1：无事实记录最高 2 分
+
+# ══════════════════════════════════════════════════════════════════
+# 证据卡 · 由宿主（AI）把口语转成结构化事实，引擎只判结构完整度
+# ══════════════════════════════════════════════════════════════════
+# 为什么不让模型直接判分：判分一旦交给模型，结论就不可复现，
+# 而且「顺着用户说」正是模型最擅长的失败模式。所以分工是——
+# **AI 负责从对话里抽出事实要素，引擎负责数要素并据此定上限。**
+EVIDENCE_FIELDS = [
+    ("when", "时间"),
+    ("who", "对象"),
+    ("what", "发生了什么"),
+    ("amount", "金额或数量"),
+    ("proof", "凭证类型"),
+]
+
+# 等级 → 该项分数上限。等级越高，能支撑的分数越高；判分只做 min(自评, 上限)。
+EVIDENCE_LEVEL_LABEL = {
+    0: "无证据",
+    1: "未结构化的口头自述",
+    2: "要素不全",
+    3: "要素基本齐备（时间 + 经过 + 第三方）",
+    4: "有凭证的结构化证据",
+}
+EVIDENCE_CAP = {0: NO_EVIDENCE_CAP, 1: 3, 2: 3, 3: 4, 4: 5}
+
+
+def grade_evidence(ev):
+    """证据卡 → (等级, 缺失要素, 是否旧式字符串)。
+
+    0 级：没有证据 → 封顶 2 分（沿用第三章 3.1）
+    1 级：一段文字，未结构化 → 封顶 3 分
+    2 级：有结构但要素 < 3 → 封顶 3 分
+    3 级：≥3 个要素且含「时间 + 发生了什么」 → 封顶 4 分
+    4 级：≥4 个要素且含凭证 → 封顶 5 分
+    """
+    all_labels = [label for _k, label in EVIDENCE_FIELDS]
+    if ev is None or (isinstance(ev, str) and not ev.strip()):
+        return 0, all_labels, False
+    if isinstance(ev, str):
+        # 旧配置：一段自述。允许跑通，但只能支撑到 3 分——没有结构的"证据"
+        # 无法与编造区分，按弱证据处理，并在报告里标「未结构化」。
+        return 1, all_labels, True
+    if not isinstance(ev, dict):
+        return 1, all_labels, False
+    missing = [label for key, label in EVIDENCE_FIELDS if blank(ev.get(key))]
+    n = len(EVIDENCE_FIELDS) - len(missing)
+    if n == 0:
+        return 0, missing, False
+    core = not blank(ev.get("when")) and not blank(ev.get("what"))
+    if n >= 4 and not blank(ev.get("proof")):
+        return 4, missing, False
+    if n >= 3 and core:
+        return 3, missing, False
+    return 2, missing, False
+
+
+def evidence_text(ev):
+    """证据卡渲染成一行文字（报告与 JSON 输出共用）。"""
+    if isinstance(ev, dict):
+        order = [k for k, _l in EVIDENCE_FIELDS]
+        bits = [str(ev[k]).strip() for k in order if not blank(ev.get(k))]
+        return " · ".join(bits)
+    return str(ev or "").strip()
+
+
 SOFT_RISK_OVERLAY = 3        # 第三章 3.3：软风险命中 ≥3，高分也降级
 BAND_READY = 80              # 第三章 3.3
 BAND_CONDITIONAL = 60
@@ -167,7 +236,7 @@ FUNNEL_STAGES = [
 # 收款失败的归因分类 · 第五章 5.2（不要直接得出"市场不存在"）
 LOSS_REASONS = ["需求不足", "信任不足", "价格不足", "时机不对", "决策链不清", "交付不明确"]
 
-# 一页纸启动书 19 字段 · 第六章 6.1
+# 一页纸启动书：19 个文本字段 + price 数值项 = 20 个必填项 · 第六章 6.1
 MSO_FIELDS = [
     ("target_customer", "目标客户"), ("scenario", "客户所在场景"),
     ("pain", "最痛且可验证的问题"), ("loss", "不解决该问题的损失"),
@@ -180,6 +249,13 @@ MSO_FIELDS = [
     ("risks", "合规、数据和知识产权风险"),
     ("stop_loss", "最大投入、最长试跑时间、继续指标"), ("goal_90d", "90 天目标"),
 ]
+
+# 第 20 项：数值定价
+# 文本表里的 `price_terms` 只描述「怎么收」，第 4 条判的是「收不收」，读的是数值
+# `price`。必填统计不把它算进去的话，报告会显示「字段 19/19」而标准 4 却不过，
+# 宿主会误以为一页纸已经齐了。所以字段总数统一按 20 计（19 个文本 + 1 个数值）。
+MSO_PRICE_FIELD = ("price", "价格（数值）")
+MSO_REQUIRED = MSO_FIELDS + [MSO_PRICE_FIELD]
 
 # MSO 不可控结果承诺的绝对化表述 · 第六章 6.2 第 6 条
 ABSOLUTE_CLAIMS = ["保证", "确保", "一定能", "必然", "100%", "零风险", "包过", "包成功", "稳赚"]
@@ -251,7 +327,7 @@ PREVALIDATION_T2 = {
     "payers_min": 1,       # 付费或结算人数（与 T1 完全一致，不放宽）
 }
 
-# 最小可售单元 19 字段 · 第六章 6.1 一页纸启动书的分发驱动等价表
+# 最小可售单元：19 个文本字段 + price 数值项 = 20 个必填项 · 第六章 6.1 一页纸启动书的分发驱动等价表
 MSU_FIELDS = [
     ("target_audience", "目标受众"),
     ("consumption_scene", "受众在什么情境下消费"),
@@ -273,6 +349,9 @@ MSU_FIELDS = [
     ("stop_loss", "最大投入、最长试跑时间、继续指标"),
     ("goal_90d", "90 天目标"),
 ]
+
+MSU_PRICE_FIELD = ("price", "定价（数值）")
+MSU_REQUIRED = MSU_FIELDS + [MSU_PRICE_FIELD]
 
 # 分发驱动的书面约定 7 项 · 第六章 6.2 第 7 条的等价表
 CONTRACT_TERMS_T2 = ["版权", "授权", "分成", "更新", "退款", "数据", "售后"]
@@ -410,22 +489,38 @@ def die(msg, code=2):
 
 
 def load_config(path):
+    global _CONFIG_PATH
     if not path:
         return {}
     if not os.path.exists(path):
         die("配置文件不存在：%s" % path)
     try:
         with open(path, "r", encoding="utf-8") as fh:
-            return json.load(fh)
+            cfg = json.load(fh)
     except ValueError as exc:
         die("配置文件不是合法 JSON：%s（%s）" % (path, exc))
+    _CONFIG_PATH = os.path.abspath(path)
+    return cfg
+
+
+def ensure_parent(path):
+    """输出前建好父目录：宿主常写 out/决策书.html，目录不存在不该抛堆栈。"""
+    parent = os.path.dirname(os.path.abspath(path))
+    if parent and not os.path.isdir(parent):
+        os.makedirs(parent, exist_ok=True)
+
+
+def write_text(path, text):
+    ensure_parent(path)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(text)
+    return path
 
 
 def dump(obj, out=None):
     text = json.dumps(obj, ensure_ascii=False, indent=2)
     if out:
-        with open(out, "w", encoding="utf-8") as fh:
-            fh.write(text + "\n")
+        write_text(out, text + "\n")
         return out
     sys.stdout.write(text + "\n")
     return None
@@ -443,6 +538,30 @@ def num(v, default=None):
 def blank(v):
     return v is None or (isinstance(v, str) and not v.strip()) or \
            (isinstance(v, (list, dict)) and len(v) == 0)
+
+
+def num_field(m, key, label):
+    """数值字段：区分「没填」与「填了但不是数字」。
+
+    `num()` 对这两种情况一律返回 None，提示语如果只说「未填」，
+    宿主会以为是漏填，实际多半是把「8000 元」「7 天」写进了数值项。
+    返回 (值, 提示语, 是否格式错误)。
+    """
+    raw = (m or {}).get(key)
+    if blank(raw):
+        return None, "未填%s" % label, False
+    try:
+        return float(raw), None, False
+    except (TypeError, ValueError):
+        return None, "%s需要纯数字，「%s」无法解析" % (label, raw), True
+
+
+def price_detail(price, err, label="价格"):
+    if price is None:
+        return err
+    if price <= 0:
+        return "%s填了 %.0f，等同免费" % (label, price)
+    return "已填%s %.0f" % (label, price)
 
 
 def section(cfg, key, *parents):
@@ -539,16 +658,26 @@ def judge_score(cfg):
         if isinstance(entry, (int, float)):
             entry = {"score": entry}
         s = num(entry.get("score"))
-        evidence = (entry.get("evidence") or "").strip()
+        ev = entry.get("evidence")
+        level, ev_missing, legacy = grade_evidence(ev)
+        cap = EVIDENCE_CAP[level]
 
         flags = []
         if s is None:
             s_eff, note = NO_EVIDENCE_CAP, "未评估"
             missing.append(key)
             flags.append("missing")
-        elif not evidence:
-            s_eff, note = min(s, NO_EVIDENCE_CAP), "无证据封顶 2 分"
+        elif s > cap:
+            s_eff = cap
+            if level == 0:
+                note = "无证据封顶 2 分"
+            else:
+                note = "证据 L%d（%s）封顶 %d 分%s" % (
+                    level, EVIDENCE_LEVEL_LABEL[level], cap,
+                    "：缺 %s" % "、".join(ev_missing) if ev_missing else "")
             flags.append("capped")
+            if level <= 1:
+                flags.append("weak_evidence")
         else:
             s_eff, note = max(0.0, min(5.0, s)), ""
 
@@ -559,7 +688,10 @@ def judge_score(cfg):
         rows.append({
             "key": key, "dimension": dim, "item": text, "weight": weight,
             "raw_score": s, "effective_score": s_eff, "gained": round(gained, 2),
-            "evidence": evidence, "note": note, "flags": flags,
+            "evidence": evidence_text(ev), "evidence_card": ev if isinstance(ev, dict) else None,
+            "evidence_level": level, "evidence_cap": cap,
+            "evidence_missing": ev_missing, "evidence_legacy": legacy,
+            "note": note, "flags": flags,
         })
         d = dims.setdefault(dim, {"max": 0, "gained": 0.0, "items": 0})
         d["max"] += weight
@@ -582,6 +714,10 @@ def judge_score(cfg):
     else:
         band = "0–59 当前不适配，优先获得真实案例、补充现金储备或训练销售"
 
+    level_dist = {str(i): 0 for i in range(5)}
+    for r in rows:
+        level_dist[str(r["evidence_level"])] += 1
+
     return {
         "total": total,
         "band": band,
@@ -591,7 +727,13 @@ def judge_score(cfg):
         "missing_items": missing,
         "capped_count": len(capped),
         "missing_count": len(missing),
-        "note": "无事实记录的打分由引擎封顶 2 分（第三章 3.1）；评分不覆盖硬红线，也不替代真实付款证据。",
+        "evidence_levels": level_dist,
+        "legacy_evidence_count": sum(1 for r in rows if r["evidence_legacy"]),
+        "structured_evidence_count": sum(1 for r in rows if r["evidence_card"]),
+        "strong_evidence_count": sum(1 for r in rows if r["evidence_level"] >= 3),
+        "weak_evidence_items": [r["key"] for r in rows if "weak_evidence" in r["flags"]],
+        "note": ("没有证据最高 2 分；只有一段自述（未结构化）最高 3 分；要素齐备但缺凭证最高 3–4 分；"
+                 "要素齐备且有凭证才到 5 分。上限由引擎执行，不依赖自觉。"),
     }
 
 
@@ -1048,18 +1190,18 @@ def _mso_source(cfg, tk):
 
 
 def _judge_mso_t2(cfg, m, tk):
-    """分发驱动的最小可售单元（第十二章 12.1，字段数 19 与 T1 对齐）。"""
+    """分发驱动的最小可售单元（第十二章 12.1，字段数 20 与 T1 对齐）。"""
     if not m:
         return {"level": "NO_DATA", "track": tk, "reason": "未提供最小可售单元（MSU）",
-                "missing_fields": [l for _k, l in MSU_FIELDS], "standards": [],
-                "pass_count": 0, "total_standards": 7, "field_count": len(MSU_FIELDS),
+                "missing_fields": [l for _k, l in MSU_REQUIRED], "standards": [],
+                "pass_count": 0, "total_standards": 7, "field_count": len(MSU_REQUIRED),
                 "equiv": tk["equiv"], "note": TRACK_NOTE}
 
-    missing = [label for key, label in MSU_FIELDS if blank(m.get(key))]
+    missing = [label for key, label in MSU_REQUIRED if blank(m.get(key))]
     text_all = " ".join(str(m.get(k) or "") for k, _l in MSU_FIELDS)
 
-    cycle = num(m.get("cycle_days"))
-    price = num(m.get("price"))
+    cycle, cycle_err, cycle_bad = num_field(m, "cycle_days", "单元产出周期")
+    price, price_err, price_bad = num_field(m, "price", "定价")
     has_triplet = all(not blank(m.get(k)) for k in ("target_audience", "unmet_need", "min_unit"))
     has_io = all(not blank(m.get(k)) for k in ("deliverables", "acceptance", "exclusions"))
     absolute = [w for w in ABSOLUTE_CLAIMS if w in text_all]
@@ -1071,12 +1213,13 @@ def _judge_mso_t2(cfg, m, tk):
          "detail": "" if has_triplet else "目标受众 / 未满足需求 / 单元形态 三项未齐备"},
         {"no": 2, "text": "单元产出周期通常不超过 14 天（除非较长周期是受众必要条件）",
          "pass": cycle is not None and cycle <= 14,
-         "detail": "已填 %.0f 天" % cycle if cycle is not None else "未填单元产出周期"},
+         "detail": ("已填 %.0f 天" % cycle) if (cycle is not None and cycle <= 14) else
+                   (cycle_err or "已填 %.0f 天，超过 14 天" % cycle)},
         {"no": 3, "text": "有明确的产出物、验收标准和不包含事项",
          "pass": has_io, "detail": "" if has_io else "产出物 / 验收标准 / 不包含事项 有缺项"},
         {"no": 4, "text": "必须收费，免费或纯流量不构成市场验证",
          "pass": price is not None and price > 0,
-         "detail": "已填定价 %.0f" % price if price is not None else "未填定价或定价为 0"},
+         "detail": price_detail(price, price_err, "定价")},
         {"no": 5, "text": "单人可手动完成，且不依赖无法控制的长期配合",
          "pass": not blank(m.get("unit_hours")),
          "detail": "" if not blank(m.get("unit_hours")) else "未填单元产能工时，无法判断单人可控性"},
@@ -1092,12 +1235,15 @@ def _judge_mso_t2(cfg, m, tk):
         "INCOMPLETE" if missing else "NOT_READY")
     return {
         "level": level, "track": tk,
-        "reason": ("7 条最低标准全部满足，19 个单元字段齐备" if level == "OK" else
+        "reason": ("7 条最低标准全部满足，20 个单元字段齐备" if level == "OK" else
                    ("缺 %d 个必填字段" % len(missing) if missing else
                     "标准通过 %d/7，未达可售门槛" % passed)),
         "missing_fields": missing,
-        "field_count": len(MSU_FIELDS),
+        "field_count": len(MSU_REQUIRED),
         "standards": standards, "pass_count": passed, "total_standards": len(standards),
+        "numeric_fields": {"price": {"value": price, "unparsable": price_bad},
+                           "cycle_days": {"value": cycle, "unparsable": cycle_bad}},
+        "format_errors": [e for e, bad in ((price_err, price_bad), (cycle_err, cycle_bad)) if bad],
         "equiv": tk["equiv"],
         "note": "必须收费。免费或纯流量只能用于内部练习，不能替代市场验证（第六章 6.2）。",
     }
@@ -1110,14 +1256,14 @@ def judge_mso(cfg):
         return _judge_mso_t2(cfg, m, tk)
     if not m:
         return {"level": "NO_DATA", "track": tk, "reason": "未提供最小可售 Offer（MSO）",
-                "missing_fields": [l for _k, l in MSO_FIELDS], "standards": [],
+                "missing_fields": [l for _k, l in MSO_REQUIRED], "standards": [],
                 "pass_count": 0, "total_standards": 7}
 
-    missing = [label for key, label in MSO_FIELDS if blank(m.get(key))]
+    missing = [label for key, label in MSO_REQUIRED if blank(m.get(key))]
     text_all = " ".join(str(m.get(k) or "") for k, _l in MSO_FIELDS)
 
-    cycle = num(m.get("cycle_days"))
-    price = num(m.get("price"))
+    cycle, cycle_err, cycle_bad = num_field(m, "cycle_days", "交付周期")
+    price, price_err, price_bad = num_field(m, "price", "价格")
     has_triplet = all(not blank(m.get(k)) for k in ("target_customer", "pain", "min_result"))
     has_io = all(not blank(m.get(k)) for k in ("deliverables", "client_inputs", "acceptance", "exclusions"))
     absolute = [w for w in ABSOLUTE_CLAIMS if w in text_all]
@@ -1128,12 +1274,13 @@ def judge_mso(cfg):
          "pass": has_triplet, "detail": "" if has_triplet else "目标客户 / 最痛问题 / 最小结果 三项未齐备"},
         {"no": 2, "text": "交付周期通常不超过 14 天（除非较长周期是客户必要条件）",
          "pass": cycle is not None and cycle <= 14,
-         "detail": "已填 %.0f 天" % cycle if cycle is not None else "未填交付周期"},
+         "detail": ("已填 %.0f 天" % cycle) if (cycle is not None and cycle <= 14) else
+                   (cycle_err or "已填 %.0f 天，超过 14 天" % cycle)},
         {"no": 3, "text": "有明确的输入、输出、验收标准和不包含事项",
          "pass": has_io, "detail": "" if has_io else "交付物 / 客户输入 / 验收标准 / 不包含事项 有缺项"},
         {"no": 4, "text": "必须收费，免费项目不能替代市场验证",
          "pass": price is not None and price > 0,
-         "detail": "已填价格 %.0f" % price if price is not None else "未填价格或价格为 0"},
+         "detail": price_detail(price, price_err)},
         {"no": 5, "text": "单人可以手动完成，且不依赖客户无法控制的长期配合",
          "pass": not blank(m.get("delivery_hours")),
          "detail": "" if not blank(m.get("delivery_hours")) else "未填预计交付工时，无法判断单人可控性"},
@@ -1150,14 +1297,17 @@ def judge_mso(cfg):
     return {
         "level": level,
         "track": tk,
-        "reason": ("7 条最低标准全部满足，19 个字段齐备" if level == "OK" else
+        "reason": ("7 条最低标准全部满足，20 个字段齐备" if level == "OK" else
                    ("缺 %d 个必填字段" % len(missing) if missing else
                     "标准通过 %d/7，未达可售门槛" % passed)),
         "missing_fields": missing,
-        "field_count": len(MSO_FIELDS),
+        "field_count": len(MSO_REQUIRED),
         "standards": standards,
         "pass_count": passed,
         "total_standards": len(standards),
+        "numeric_fields": {"price": {"value": price, "unparsable": price_bad},
+                           "cycle_days": {"value": cycle, "unparsable": cycle_bad}},
+        "format_errors": [e for e, bad in ((price_err, price_bad), (cycle_err, cycle_bad)) if bad],
         "equiv": tk["equiv"],
         "note": "必须收费。免费项目只能用于内部练习，不能替代市场验证（第六章 6.2）。",
     }
@@ -1289,6 +1439,190 @@ def judge_stop(cfg):
 
 
 # ══════════════════════════════════════════════════════════════════
+# 数据自洽性（AI 采集来的数字之间必须能对上）
+# ══════════════════════════════════════════════════════════════════
+# 阈值再严也只验大小，不验关系：targets=0、访谈 14、付款 9 这种
+# 物理上不可能的组合，原来的引擎照样判 PASS。这一层只做一件事——
+# 把口径内必然成立的算术关系跑一遍，矛盾就报出来。
+
+# 每条边：(上游键, 上游名, 下游键, 下游名, 严重度, 提示)
+# block 只给「物理上不可能」的倒挂；口径可能不同的（一人多案、分期付款、
+# 按单元交付）一律 warn，避免把正常的生意形态当成造假。
+AUDIT_CHAIN_T1 = [
+    ("targets", "目标名单", "reached", "有效触达", "warn", "触达数多于名单数，确认是否有转介绍或公开渠道"),
+    ("reached", "有效触达", "interviews", "访谈", "block", "访谈对象必然来自触达对象"),
+    ("interviews", "访谈", "advanced", "愿进一步", "warn", "愿进一步人数多于访谈人数，确认是否有人未访谈就报名"),
+    ("advanced", "愿进一步", "proposals", "提案", "warn", "提案数多于愿进一步人数，确认是否一人多案或主动提案"),
+    ("proposals", "提案", "quotes", "报价", "warn", "报价数多于提案数"),
+    ("quotes", "报价", "payers", "付款人数", "warn", "付款人数多于报价人数，确认是否有人直接下单"),
+    ("payers", "付款人数", "payments", "付款笔数", "warn", "付款笔数多于付款人数，确认是否分期或口径不同"),
+    ("payments", "付款笔数", "deliveries", "交付", "block", "交付次数不可能多于付款笔数"),
+    ("deliveries", "交付", "results", "结果", "block", "有结果的次数不可能多于交付次数"),
+]
+AUDIT_CHAIN_T2 = [
+    ("exposures", "曝光", "engaged", "留存动作", "block", "留存动作必然来自曝光"),
+    ("engaged", "留存动作", "voices", "受众原话", "block", "原话必然来自留存动作"),
+    ("voices", "受众原话", "payers", "付费或结算人数", "warn", "付费人数多于留过原话的人数，确认是否有人直接购买"),
+    ("deliveries", "按时交付", "results", "结果", "block", "有结果的单元数不可能多于交付数"),
+]
+
+
+def judge_audit(cfg):
+    tk = resolve_track(cfg)
+    t2 = is_dist_track(tk)
+    funnel = section(cfg, "funnel", "gate3")
+    issues, checked = [], 0
+
+    def add(code, severity, message, hint):
+        issues.append({"code": code, "severity": severity,
+                       "message": message, "hint": hint})
+
+    chain = AUDIT_CHAIN_T2 if t2 else AUDIT_CHAIN_T1
+    for up_key, up_label, down_key, down_label, severity, hint in chain:
+        up = num(funnel.get(up_key))
+        down = num(funnel.get(down_key))
+        if up is None or down is None:
+            continue
+        checked += 1
+        if down > up:
+            add("funnel_order", severity,
+                "漏斗不递进：「%s」%.0f 大于上一环节「%s」%.0f"
+                % (down_label, down, up_label, up), hint)
+
+    t1_present = [k for k, *_r in AUDIT_CHAIN_T1 if num(funnel.get(k)) is not None]
+    t2_present = [k for k, *_r in AUDIT_CHAIN_T2 if num(funnel.get(k)) is not None]
+    if t2 and t1_present and not t2_present:
+        add("track_fields", "warn",
+            "验证路径是分发驱动，但漏斗填的是销售驱动的八环节字段",
+            "改用 units_listed / exposures / engaged / voices / payers / deliveries / results")
+    if (not t2) and t2_present and not t1_present:
+        add("track_fields", "warn",
+            "验证路径是销售驱动，但漏斗填的是分发驱动字段",
+            "改用 targets / reached / interviews / advanced / proposals / quotes / payers / payments / deliveries / results")
+
+    # 评分里声称收过款，但漏斗和订单里一笔付款都没有
+    items = (cfg.get("score") or {}).get("items") or {}
+    claimed = 0
+    for key in ("full_cycle_paid", "paid_evidence"):
+        e = items.get(key) or {}
+        if isinstance(e, (int, float)):
+            continue
+        if (num(e.get("score")) or 0) >= 4 and not blank(e.get("evidence")):
+            claimed += 1
+    payers = num(funnel.get("payers")) or 0
+    orders = (cfg.get("econ") or {}).get("orders") or []
+    paid_orders = [o for o in orders if (num(o.get("revenue")) or 0) > 0]
+    if claimed and payers == 0 and not paid_orders:
+        add("claim_vs_data", "warn",
+            "评分里声称「独立完成收款 / 已有付费客户」，但漏斗与经济数据里没有任何付款记录",
+            "确认这是过去项目还是本次方向；若属过去项目，请把漏斗按本次方向重填")
+
+    blocks = [i for i in issues if i["severity"] == "block"]
+    warns = [i for i in issues if i["severity"] == "warn"]
+    level = "INCONSISTENT" if blocks else ("WARN" if warns else "OK")
+    return {
+        "level": level,
+        "track": tk,
+        "issues": issues,
+        "block_count": len(blocks),
+        "warn_count": len(warns),
+        "checked": checked,
+        "reason": ("%d 处数字自相矛盾" % len(blocks)) if blocks else (
+            "%d 处口径待确认" % len(warns) if warns else "关键数字之间没有矛盾"),
+        "note": "只校验口径内必然成立的算术关系与口径一致性；不校验事实是否为真——那要靠凭证。",
+    }
+
+
+# ══════════════════════════════════════════════════════════════════
+# 取证追问清单（AI 负责怎么问，引擎负责问什么）
+# ══════════════════════════════════════════════════════════════════
+
+PROBE_LIMIT = 12
+
+
+def judge_probe(cfg):
+    """把「还缺什么、哪里对不上」转成下一轮的追问清单。
+
+    这是「更 AI」那一半：模型不该自己判断证据够不够，而该照着引擎
+    开出的清单去追问；问完把答案写回证据卡，再由引擎重新判。
+    """
+    tk = resolve_track(cfg)
+    items = []
+
+    def add(kind, target, question, why, source, priority):
+        items.append({"kind": kind, "target": target, "ask": question,
+                      "why": why, "source": source, "priority": priority})
+
+    # 1 · 数字矛盾（最优先：矛盾没解决，后面的证据都不用问）
+    for i in judge_audit(cfg)["issues"]:
+        add("consistency", "漏斗 / 关键数字", i["hint"], i["message"],
+            "数据自洽性", 0 if i["severity"] == "block" else 1)
+
+    # 2 · 证据卡缺要素（按权重从高到低）
+    if (cfg.get("score") or {}).get("items"):
+        rows = [r for r in judge_score(cfg)["rows"] if r["evidence_level"] < 4]
+        rows.sort(key=lambda r: -r["weight"])
+        for r in rows:
+            if r["evidence_level"] == 0:
+                add("evidence", r["item"],
+                    "这一项有没有真的发生过一次？什么时候、对谁、结果是什么？拿得出合同、回单、后台截图或对方原话吗？",
+                    "当前无证据，该项最高 2 分", "第三章 3.1", 2)
+            elif r["evidence_level"] == 1:
+                add("evidence", r["item"],
+                    "把这件事拆开说：什么时候 / 对谁 / 做了什么、结果多少 / 凭证是什么？",
+                    "只写了一段自述，未结构化，最高 3 分", "第三章 3.1", 2)
+            else:
+                add("evidence", r["item"],
+                    "还缺「%s」，补得上吗？" % "、".join(r["evidence_missing"]),
+                    "要素不全，该项上限 %d 分" % r["evidence_cap"], "第三章 3.1", 3)
+
+    # 3 · 一页纸 Offer 的缺口
+    mso = judge_mso(cfg)
+    for label in (mso.get("missing_fields") or [])[:4]:
+        add("offer", label, "「%s」具体是什么？" % label,
+            "一页纸 Offer 缺必填字段", "第六章 6.1", 3)
+    for s in mso.get("standards", []):
+        if not s["pass"] and s["detail"]:
+            add("offer", s["text"], "第 %d 条没过：%s 怎么补？" % (s["no"], s["detail"]),
+                "MSO 7 条最低标准未满足", "第六章 6.2", 4)
+
+    # 4 · 漏斗瓶颈
+    b = judge_funnel(cfg).get("bottleneck")
+    if b:
+        add("funnel", b["label"],
+            "「%s」这一环的转化率只有 %s%%，具体是哪一步断的？客户当时说了什么？"
+            % (b["label"], b.get("conversion_pct")),
+            "漏斗瓶颈，缺口在这里而不是「市场不存在」", "第五章 5.3", 4)
+
+    # 5 · 第二层槽位（仅在第一层已放行时才有意义）
+    l2 = cfg.get("layer2") or {}
+    if l2:
+        slots = l2.get("slots") or {}
+        if blank(slots.get("north_star")):
+            add("layer2", "北极星指标", "哪个指标最能代表客户持续获得价值？",
+                "五槽位缺北极星", "第十二章 12.4", 5)
+        for k, label in (("process", "过程指标"), ("safety", "安全指标")):
+            vals = slots.get(k) or []
+            if len([v for v in vals if not blank(v)]) < 2:
+                add("layer2", label, "两个%s分别是什么？现在拿得到数据吗？" % label,
+                    "五槽位缺%s" % label, "第十二章 12.4", 5)
+
+    items.sort(key=lambda i: (i["priority"], i["kind"]))
+    total = len(items)
+    shown = items[:PROBE_LIMIT]
+    return {
+        "level": "OK" if not total else "NEEDS_PROBING",
+        "track": tk,
+        "count": total,
+        "items": shown,
+        "truncated": total > len(shown),
+        "note": ("宿主按顺序问，每轮最多 3 条（SKILL.md 4.0 R1）；答完写回证据卡与数据，"
+                 "再跑一次 assay，不要自己判断「够了」。" if total else
+                 "当前没有需要追问的项：证据等级与数字自洽性都过关。"),
+    }
+
+
+# ══════════════════════════════════════════════════════════════════
 # 第一层合成结论（第一/三/四/五/六/七/十/十二章）
 # ══════════════════════════════════════════════════════════════════
 
@@ -1304,6 +1638,7 @@ def judge_assay(cfg):
     mso = judge_mso(cfg)
     delivery = judge_delivery(cfg)
     stop = judge_stop(cfg)
+    audit = judge_audit(cfg)
 
     reasons, gaps, caps = [], [], []
     if not has_score:
@@ -1315,7 +1650,7 @@ def judge_assay(cfg):
             "gate1": gate1, "score": None, "econ": econ,
             "gate3": {"direct": direct, "funnel": funnel},
             "gate4": {"mso": mso, "delivery": delivery},
-            "stop": stop,
+            "stop": stop, "audit": audit,
             "gaps": ["红线 2 未评估"], "repairs": [], "next_actions": [],
             "may_enter_layer2": False, "scale_gate": {"pass": False, "items": []},
             "evidence_rule": EVIDENCE_RULE,
@@ -1377,8 +1712,17 @@ def judge_assay(cfg):
         reasons.append("止损监控：%s" % stop["reason"])
         level = cap_at("CONDITIONAL", "止损监控触发 PAUSE")
 
+    if audit["level"] == "INCONSISTENT":
+        reasons.append("数据自洽性：%s" % audit["reason"])
+        level = cap_at("CONDITIONAL", "数据自洽性：%d 处数字自相矛盾" % audit["block_count"])
+
     if score["capped_count"]:
-        gaps.append("适配度评分中有 %d 项无证据，已按 2 分封顶" % score["capped_count"])
+        gaps.append("适配度评分中有 %d 项被证据等级压分（L3 及以上只有 %d 项）"
+                    % (score["capped_count"], score.get("strong_evidence_count", 0)))
+    if score.get("legacy_evidence_count"):
+        gaps.append("%d 项证据仍是未结构化的自述，最高 3 分——旧式写法不提供兼容开关，"
+                    "要拆成时间 / 对象 / 经过 / 金额 / 凭证五要素才能重算"
+                    % score["legacy_evidence_count"])
     if gate1["soft_count"]:
         gaps.append("软风险命中 %d 项：%s" % (
             gate1["soft_count"], "、".join(h["text"] for h in gate1["soft_hits"])))
@@ -1419,6 +1763,9 @@ def judge_assay(cfg):
     if delivery["level"] == "NO_DATA":
         gaps.append("交付结果未评估：" + ("首 3 个付费单元验证标准待记录" if t2
                                      else "首 3 个客户验证标准待记录"))
+    for i in audit["issues"]:
+        gaps.append("数据自洽性（%s）：%s" % ("必须核对" if i["severity"] == "block" else "待确认",
+                                         i["message"]))
 
     repairs = []
     for r in score["rows"]:
@@ -1445,7 +1792,8 @@ def judge_assay(cfg):
     elif level == "CONDITIONAL":
         nxt = ["按短板修复计划执行，修复期内不全职启动"]
         if score["capped_count"]:
-            nxt.append("补齐 %d 项无证据评分项的事实记录" % score["capped_count"])
+            nxt.append("补齐 %d 项被压分评分项的证据（时间 / 对象 / 经过 / 金额 / 凭证）"
+                       % score["capped_count"])
         if mso.get("missing_fields"):
             nxt.append("补齐 MSO 的 %d 个必填字段" % len(mso["missing_fields"]))
         if funnel["level"] in ("NO_DATA", "NO_PAYMENT", "BELOW_THRESHOLD"):
@@ -1483,7 +1831,7 @@ def judge_assay(cfg):
         "gate1": gate1, "score": score, "econ": econ,
         "gate3": {"direct": direct, "funnel": funnel},
         "gate4": {"mso": mso, "delivery": delivery},
-        "stop": stop,
+        "stop": stop, "audit": audit,
         "gaps": gaps, "repairs": repairs, "next_actions": nxt,
         "may_enter_layer2": level == "READY_FOR_LAYER2",
         "scale_gate": scale_gate,
@@ -1514,7 +1862,11 @@ def state_path(cfg, explicit=None):
     if explicit:
         return explicit
     s = cfg.get("state") or {}
-    return s.get("path") or os.path.join(os.getcwd(), "opc-bootstrap-state.json")
+    if s.get("path"):
+        return s["path"]
+    if _CONFIG_PATH:
+        return os.path.join(os.path.dirname(_CONFIG_PATH), "opc-bootstrap-state.json")
+    return os.path.join(os.getcwd(), "opc-bootstrap-state.json")
 
 
 def state_read(path):
@@ -1559,8 +1911,7 @@ def state_write(st, cfg):
                 shutil.copyfile(path, path + ".bak")
         except IOError:
             pass
-    with open(path, "w", encoding="utf-8") as fh:
-        fh.write(body)
+    write_text(path, body)
     return path
 
 
@@ -2214,6 +2565,7 @@ def render_report(cfg, mask=None):
     mso = g4.get("mso") or {}
     delivery = g4.get("delivery") or {}
     stopinfo = res.get("stop") or {}
+    audit = res.get("audit") or {}
     user = cfg.get("user") or {}
 
     audience = (user.get("audience") or "external").lower()
@@ -2279,7 +2631,16 @@ def render_report(cfg, mask=None):
         summ.append(("适配度评分", "%s / 100（%s）" % (score.get("total"), score.get("band", "").split(" ")[0]),
                      "green" if score.get("total", 0) >= 80 else ("amber" if score.get("total", 0) >= 60 else "red")))
         if score.get("capped_count"):
-            summ.append(("证据缺口", "%d 项无证据，已封顶 2 分" % score["capped_count"], "amber"))
+            summ.append(("证据缺口", "%d 项被证据等级压分（L3 及以上 %d 项）" % (
+                score["capped_count"], score.get("strong_evidence_count", 0)), "amber"))
+        if score.get("legacy_evidence_count"):
+            summ.append(("未结构化证据", "%d 项仍是一段自述，最高 3 分"
+                         % score["legacy_evidence_count"], "amber"))
+    if audit:
+        at = {"OK": ("无矛盾", "green"), "WARN": ("口径待确认", "amber"),
+              "INCONSISTENT": ("数字自相矛盾", "red")}.get(audit.get("level"), (audit.get("level"), "gray"))
+        summ.append(("数据自洽性", "%s（矛盾 %d · 待确认 %d）" % (
+            at[0], audit.get("block_count", 0), audit.get("warn_count", 0)), at[1]))
     if econ:
         econ_tag = {"PASS": ("通过", "green"), "NO_DATA": ("无交易数据", "gray"),
                     "BELOW_TARGET": ("低于目标时薪", "amber"), "LOSS": ("亏损", "red"),
@@ -2303,7 +2664,7 @@ def render_report(cfg, mask=None):
     mt = {"OK": ("可售", "green"), "INCOMPLETE": ("字段缺失", "amber"),
           "NOT_READY": ("未达可售门槛", "amber"), "NO_DATA": ("未评估", "gray")}.get(mso.get("level"),
                                                                                 (mso.get("level"), "gray"))
-    _mso_field_total = len(MSU_FIELDS if t2 else MSO_FIELDS)
+    _mso_field_total = len(MSU_REQUIRED if t2 else MSO_REQUIRED)
     summ.append(("红线 4 %s" % ("最小可售单元" if t2 else "最小可售 Offer"),
                  "%s（标准 %s/%s · 字段 %s/%s）" % (
                      mt[0], mso.get("pass_count", 0), mso.get("total_standards", 7),
@@ -2398,19 +2759,48 @@ def render_report(cfg, mask=None):
         parts.append("</table>")
         parts.append("<h3>逐项明细（%s / 100）</h3>" % score["total"])
         parts.append("<table><tr><th>评估项</th><th class='n'>权重</th><th class='n'>得分</th>"
-                     "<th class='n'>计入</th><th>证据</th></tr>")
+                     "<th class='n'>计入</th><th>证据卡</th></tr>")
         for r in score["rows"]:
             flag = ""
             if "capped" in r["flags"]:
                 flag = _tag("封顶", "amber")
             elif "missing" in r["flags"]:
                 flag = _tag("未评估", "gray")
+            lvl = r["evidence_level"]
+            lvl_tag = _tag("L%d" % lvl, "green" if lvl >= 3 else ("amber" if lvl >= 1 else "gray"))
+            detail = "证据 %s · 上限 %d 分" % (lvl_tag, r["evidence_cap"])
+            if r["evidence_missing"] and lvl > 0:
+                detail += " · 缺 %s" % esc("、".join(r["evidence_missing"]))
+            if r["evidence_legacy"]:
+                detail += " · 未结构化"
+            if mask:
+                # 对外交付：证据卡里的对象与金额属于敏感项，只留「发生了什么」。
+                card = r["evidence_card"] or {}
+                shown = str(card.get("what") or "").strip()
+                if shown:
+                    ev_html = "%s<div class='muted'>对象、金额与凭证细节已脱敏</div>" % esc(shown)
+                elif r["evidence"]:
+                    ev_html = "<span class='muted'>（证据已脱敏）</span>"
+                else:
+                    ev_html = "<span class='muted'>无</span>"
+            else:
+                ev_html = esc(r["evidence"]) or "<span class='muted'>无</span>"
             parts.append("<tr><td>%s<div class='muted'>%s</div></td><td class='n'>%d</td><td class='n'>%s</td>"
-                         "<td class='n'>%.2f %s</td><td>%s</td></tr>"
+                         "<td class='n'>%.2f %s</td><td>%s<div class='muted'>%s</div></td></tr>"
                          % (esc(r["item"]), esc(r["dimension"]), r["weight"],
                             "-" if r["raw_score"] is None else esc(r["raw_score"]),
-                            r["gained"], flag, esc(r["evidence"]) or "<span class='muted'>无</span>"))
+                            r["gained"], flag, ev_html, detail))
         parts.append("</table>")
+        parts.append("<h3>证据等级与得分上限</h3>")
+        parts.append("<table><tr><th>等级</th><th>证据长什么样</th><th class='n'>分数上限</th></tr>")
+        for lv in range(5):
+            parts.append("<tr><td class='n'>L%d</td><td>%s</td><td class='n'>%d</td></tr>"
+                         % (lv, esc(EVIDENCE_LEVEL_LABEL[lv]), EVIDENCE_CAP[lv]))
+        parts.append("</table>")
+        parts.append("<p class='muted'>证据卡由宿主从对话里抽取 5 个要素：%s。"
+                     "要素数决定该项能吃多少分——只写一段自述（未结构化）最高 3 分，"
+                     "有凭证才到 5 分。这一条同样由引擎执行。</p>"
+                     % esc(" / ".join(l for _k, l in EVIDENCE_FIELDS)))
         parts.append("<h3>评分锚定（第三章 3.1）</h3>")
         parts.append("<table><tr><th>分</th><th>含义</th></tr>")
         for lo, label in SCORE_LEVELS:
@@ -2899,6 +3289,21 @@ def render_board(cfg, mask=None):
 # 输入模板
 # ══════════════════════════════════════════════════════════════════
 
+def _blank_offer(fields):
+    """19 个文本字段 + price 数值项（合计 20 个必填项）。
+
+    price 必须出现在骨架里：第 4 条判的是**数值定价**，只把「8000 元」写进
+    `price_terms` 文本永远过不了——这是模板与判据之间最容易断的一环。
+    """
+    out = {}
+    for key, _label in fields:
+        if key == "price_terms":
+            out["price"] = None
+        out[key] = ""
+    out.setdefault("price", None)
+    return out
+
+
 def template():
     t = {
         "user": {"name": "", "date": today(), "audience": "external"},
@@ -2911,7 +3316,9 @@ def template():
             "soft_risks": [],
             "stop_loss": {"max_cash": "", "max_weeks": "", "min_result": ""},
         },
-        "score": {"items": {k: {"score": None, "evidence": ""} for k, _d, _t2, _w in SCORE_ITEMS}},
+        "score": {"items": {k: {"score": None,
+                                "evidence": {f: (None if f == "amount" else "") for f, _l in EVIDENCE_FIELDS}}
+                            for k, _d, _t2, _w in SCORE_ITEMS}},
         "gate3": {
             "directions": [{"name": "", "basis": "past_results",
                             "scores": {k: None for k, _l, _w, _q in DIRECTION_ITEMS},
@@ -2922,8 +3329,8 @@ def template():
                        "loss_reasons": {k: 0 for k in LOSS_REASONS}},
         },
         "gate4": {
-            "mso": {k: "" for k, _l in MSO_FIELDS},
-            "msu": {k: "" for k, _l in MSU_FIELDS},
+            "mso": _blank_offer(MSO_FIELDS),
+            "msu": _blank_offer(MSU_FIELDS),
             "delivery": {"paying_customers": None, "scope_controlled": None, "econ_positive": None,
                          "feedback": "", "follow_ons": None, "compliant": None, "still_willing": None},
         },
@@ -3037,6 +3444,10 @@ def run_selftest(cases_path=None):
             got = judge_econ(cfg)
         elif kind == "stop":
             got = judge_stop(cfg)
+        elif kind == "audit":
+            got = judge_audit(cfg)
+        elif kind == "probe":
+            got = judge_probe(cfg)
         elif kind == "assay":
             got = judge_assay(cfg)
         elif kind == "track":
@@ -3195,6 +3606,64 @@ def run_selftest(cases_path=None):
                 os.rmdir(tmpd)
             except OSError:
                 pass
+        elif kind == "template_ok":
+            # 回归：模板骨架必须能被填成「7 条全过」。模板少一个必填数值项，
+            # 宿主照文档填完也永远过不了第 4 条——整条流程会死在一个假结论上。
+            t = template()
+            problems = []
+            for key, terms, track_key in (("mso", CONTRACT_TERMS, "T1"),
+                                          ("msu", CONTRACT_TERMS_T2, "T2")):
+                sec = t["gate4"][key]
+                if "price" not in sec:
+                    problems.append("%s 骨架缺 price 数值项" % key)
+                for k in list(sec):
+                    sec[k] = 7 if k == "cycle_days" else (8000 if k == "price" else "已填写内容")
+                sec["price_terms"] = "；".join(terms)
+                res = judge_mso({"track": {"key": track_key}, "gate4": {key: sec}})
+                if res["level"] != "OK":
+                    problems.append("%s 填满模板后仍不达标：%s（%s）" % (
+                        key, res["reason"],
+                        "；".join(s["detail"] for s in res["standards"] if not s["pass"])))
+            # 评分骨架的证据也必须是结构化卡片：写成空字符串会让宿主只能填一段自述，
+            # 开局就把所有人锁在 L1（最高 3 分）。
+            for key, item in (t["score"]["items"] or {}).items():
+                ev = item.get("evidence")
+                if not isinstance(ev, dict):
+                    problems.append("score.%s 的证据不是结构化卡片" % key)
+                    break
+                lost = [f for f, _l in EVIDENCE_FIELDS if f not in ev]
+                if lost:
+                    problems.append("score.%s 证据卡缺字段 %s" % (key, lost))
+                    break
+            got = {"problems": problems,
+                   "fields": sum(len(t["gate4"][k]) for k in ("mso", "msu"))}
+        elif kind == "evidence_grade":
+            # 证据分级：等级必须真的改变分数上限，否则「结构化证据」只是装饰。
+            def _mk(ev):
+                return {"score": {"items": {k: {"score": 5, "evidence": ev}
+                                            for k, _d, _t, _w in SCORE_ITEMS}}}
+
+            samples = {
+                "none": _mk(""),
+                "legacy": _mk("做过一次，客户很满意"),
+                "partial": _mk({"when": "2026-03", "who": "客户 A",
+                                "what": "交付知识库", "amount": 8000}),
+                "full": _mk({"when": "2026-03", "who": "客户 A", "what": "交付知识库",
+                             "amount": 8000, "proof": "银行回单"}),
+            }
+            res = {k: judge_score(v) for k, v in samples.items()}
+            got = {
+                "total_none": res["none"]["total"],
+                "total_legacy": res["legacy"]["total"],
+                "total_partial": res["partial"]["total"],
+                "total_full": res["full"]["total"],
+                "band_partial": res["partial"]["band"],
+                "band_legacy": res["legacy"]["band"],
+                "legacy_count": res["legacy"]["legacy_evidence_count"],
+                "level_legacy": res["legacy"]["rows"][0]["evidence_level"],
+                "level_partial": res["partial"]["rows"][0]["evidence_level"],
+                "level_full": res["full"]["rows"][0]["evidence_level"],
+            }
         elif kind == "board":
             got = judge_board(cfg)
         elif kind in ("report", "board_html"):
@@ -3253,6 +3722,8 @@ def main(argv=None):
         ("delivery", "红线 4：首 3 个客户的验证标准"),
         ("econ", "红线 5：单位经济核算"),
         ("stop", "止损与退出监控（含替代路径）"),
+        ("audit", "数据自洽性：漏斗与关键数字之间必须能对上"),
+        ("probe", "取证追问清单：把缺的要素与矛盾转成下一轮问题"),
         ("assay", "第一层合成结论（主命令）"),
         ("state", "读写状态档案"),
         ("report", "生成 HTML 决策书"),
@@ -3270,7 +3741,8 @@ def main(argv=None):
             sp.add_argument("--mask", dest="mask", action="store_true", default=None)
             sp.add_argument("--no-mask", dest="mask", action="store_false")
         if name == "report":
-            sp.add_argument("--out", "-o", required=True)
+            sp.add_argument("--out", "-o", default=None,
+                            help="报告输出路径；--sync-only 时可省略")
             sp.add_argument("--sync-state", action="store_true",
                             help="出报告的同时把结论写回状态档案")
             sp.add_argument("--sync-only", action="store_true",
@@ -3327,8 +3799,7 @@ def main(argv=None):
         payload = layer2_payload(cfg)
         if args.out:
             html_out = render_board(cfg, mask=args.mask)
-            with open(args.out, "w", encoding="utf-8") as fh:
-                fh.write(html_out)
+            write_text(args.out, html_out)
             print("看板已生成：%s（%d 字节）" % (args.out, len(html_out.encode("utf-8"))))
         else:
             dump(payload["board"])
@@ -3352,6 +3823,10 @@ def main(argv=None):
         dump(judge_econ(cfg))
     elif args.cmd == "stop":
         dump(judge_stop(cfg))
+    elif args.cmd == "audit":
+        dump(judge_audit(cfg))
+    elif args.cmd == "probe":
+        dump(judge_probe(cfg))
     elif args.cmd == "assay":
         dump(judge_assay(cfg))
     elif args.cmd == "report":
@@ -3360,10 +3835,9 @@ def main(argv=None):
             cfg.setdefault("user", {})["audience"] = "external" if args.mask else "internal"
         if not args.sync_only:
             if not args.out:
-                die("--sync-only 之外必须提供 --out")
+                die("出报告需要 --out；只想写状态档案请加 --sync-only")
             html_out = render_report(cfg, mask=args.mask)
-            with open(args.out, "w", encoding="utf-8") as fh:
-                fh.write(html_out)
+            write_text(args.out, html_out)
             print("报告已生成：%s（%d 字节）" % (args.out, len(html_out.encode("utf-8"))))
         if args.sync_state or args.sync_only:
             out = cmd_state(cfg, note="report 同步")

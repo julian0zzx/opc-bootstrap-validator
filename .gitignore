@@ -1,4 +1,4 @@
-# 运行时产物：状态档案落在 cwd，不进仓库
+# 运行时产物：状态档案默认落在输入配置同目录，不进仓库
 opc-bootstrap-state.json
 *.state.json
 

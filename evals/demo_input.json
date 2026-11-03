@@ -29,63 +29,153 @@
     "items": {
       "motive_choice": {
         "score": 4,
-        "evidence": "2025 年起持续投入这件事，是想清楚了要经营业务，不只是不想上班"
+        "evidence": {
+          "when": "2025-01 至今",
+          "who": "自己 / 家人",
+          "what": "持续投入并制定经营计划，不是逃避职场",
+          "amount": 0,
+          "proof": "经营计划文档 + 周报"
+        }
       },
       "tolerate_uncertainty": {
         "score": 4,
-        "evidence": "没人盯着也连续推进了 6 个月，周报都在"
+        "evidence": {
+          "when": "2025-07 至 2026-01",
+          "who": "自己",
+          "what": "无人监督下连续推进 6 个月",
+          "amount": 0,
+          "proof": "6 个月周报存档"
+        }
       },
       "long_term_roles": {
         "score": 4,
-        "evidence": "销售、交付、售后都自己扛，近半年做过 3 次售后复盘"
+        "evidence": {
+          "when": "2025-09 至 2026-03",
+          "who": "3 个客户",
+          "what": "独立承担销售、交付、售后并做复盘",
+          "amount": 3,
+          "proof": "售后复盘记录 3 份"
+        }
       },
       "rejection_resilience": {
         "score": 4,
-        "evidence": "被拒 20 多次，期间改过两次 Offer 结构"
+        "evidence": {
+          "when": "2025-10 至 2026-03",
+          "who": "20+ 潜在客户",
+          "what": "被拒后两次调整 Offer 并继续推进",
+          "amount": 20,
+          "proof": "触达记录表"
+        }
       },
       "full_cycle_paid": {
         "score": 5,
-        "evidence": "独立完成 3 笔回款，累计 4.2 万元，交付记录齐全"
+        "evidence": {
+          "when": "2025-06 至 2026-02",
+          "who": "客户甲 / 乙 / 丙",
+          "what": "独立完成获客—报价—签约—交付—收款全闭环",
+          "amount": 42000,
+          "proof": "合同 + 银行回单"
+        }
       },
       "sellable_skill": {
         "score": 4,
-        "evidence": "作品集有 6 个案例，其中 3 个拿到客户署名许可"
+        "evidence": {
+          "when": "2024 至 2026",
+          "who": "6 个客户项目",
+          "what": "形成可对外展示的作品集，3 个拿到署名许可",
+          "amount": 6,
+          "proof": "作品集链接 + 署名许可"
+        }
       },
       "boundary_judgment": {
         "score": 4,
-        "evidence": "写了不服务清单，并据此拒掉 2 个超出交付范围的需求"
+        "evidence": {
+          "when": "2025-11",
+          "who": "2 个潜在客户",
+          "what": "按不服务清单拒掉超范围需求",
+          "amount": 2,
+          "proof": "不服务清单 + 沟通记录"
+        }
       },
       "sales_learning": {
         "score": 4,
-        "evidence": "触达 60 次、报价 8 次，报价单和客户异议都已记录"
+        "evidence": {
+          "when": "2025-08 至 2026-03",
+          "who": "60 个目标客户",
+          "what": "触达 60 次、报价 8 次并复盘异议",
+          "amount": 8,
+          "proof": "报价单 8 份 + 异议台账"
+        }
       },
       "cash_cushion": {
         "score": 4,
-        "evidence": "安全垫 4 个月，现金台账和止损触发线都已建好"
+        "evidence": {
+          "when": "2026-03",
+          "who": "本人家庭",
+          "what": "安全垫 4 个月，已建止损触发线",
+          "amount": 120000,
+          "proof": "现金台账"
+        }
       },
       "time_capacity": {
         "score": 4,
-        "evidence": "每周固定 20 小时投入，家庭时间也已排好"
+        "evidence": {
+          "when": "2025-10 至今",
+          "who": "本人 / 家庭",
+          "what": "每周固定 20 小时，家庭时间已排好",
+          "amount": 20,
+          "proof": "时间表 + 家庭分工约定"
+        }
       },
       "compliance_basics": {
         "score": 3,
-        "evidence": "合同模板初稿和风险清单已有，财税与数据合规还在补"
+        "evidence": {
+          "when": "2026-02",
+          "who": "本人",
+          "what": "合同模板与风险清单初稿，财税与数据合规待补",
+          "amount": 0,
+          "proof": "合同模板文件"
+        }
       },
       "paid_evidence": {
         "score": 5,
-        "evidence": "2 个付费客户，其中 1 笔定金、1 笔全款，凭证都在"
+        "evidence": {
+          "when": "2025-12 至 2026-02",
+          "who": "客户甲 / 乙",
+          "what": "2 笔付费：1 笔定金、1 笔全款",
+          "amount": 26000,
+          "proof": "银行回单 2 份"
+        }
       },
       "customer_clarity": {
         "score": 4,
-        "evidence": "能点名 8 个具体客户，并复述他们的痛点原话"
+        "evidence": {
+          "when": "2026-01 至 2026-03",
+          "who": "8 个目标客户",
+          "what": "点名客户并记录痛点原话",
+          "amount": 8,
+          "proof": "访谈记录 8 份"
+        }
       },
       "reachable_channel": {
         "score": 4,
-        "evidence": "抖音和知乎两条渠道，私信回复率 8%，固定触达动作跑过 3 轮"
+        "evidence": {
+          "when": "2025-11 至 2026-03",
+          "who": "抖音 / 知乎受众",
+          "what": "两条渠道固定触达 3 轮，私信回复率 8%",
+          "amount": 3,
+          "proof": "后台截图 + 触达台账"
+        }
       },
       "standardizable": {
         "score": 4,
-        "evidence": "SOP 覆盖 90% 的交付步骤，AI 只做整理和初稿，交付责任仍在本人"
+        "evidence": {
+          "when": "2026-01",
+          "who": "本人",
+          "what": "SOP 覆盖 90% 的交付步骤，AI 只做初稿",
+          "amount": 90,
+          "proof": "SOP 文档"
+        }
       },
       "light_structure": {
         "score": 5,
@@ -157,8 +247,8 @@
       "loss": "按每月浪费 60 小时客服工时、错失约 8% 询单转化估算",
       "min_result": "7 天内交付一套可直接复用的客服知识库与回复模板",
       "deliverables": "1 份结构化知识库文档 + 20 条高频问题回复模板 + 1 段使用说明",
-      "exclusions": "",
-      "client_inputs": "",
+      "exclusions": "不含客服系统对接与工单配置；不含长期顾问式陪跑；不含内容代写与投放代运营",
+      "client_inputs": "近 3 个月的客服聊天记录导出、常见问题清单、现行回复模板（如已有）",
       "cycle_days": 7,
       "acceptance": "覆盖 80% 以上的高频问题；模板可直接复制使用，无需二次改写",
       "price": 8000,

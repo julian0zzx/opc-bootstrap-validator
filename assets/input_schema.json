@@ -42,67 +42,163 @@
     "items": {
       "motive_choice": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "tolerate_uncertainty": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "long_term_roles": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "rejection_resilience": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "full_cycle_paid": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "sellable_skill": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "boundary_judgment": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "sales_learning": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "cash_cushion": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "time_capacity": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "compliance_basics": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "paid_evidence": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "customer_clarity": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "reachable_channel": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "standardizable": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       },
       "light_structure": {
         "score": null,
-        "evidence": ""
+        "evidence": {
+          "when": "",
+          "who": "",
+          "what": "",
+          "amount": null,
+          "proof": ""
+        }
       }
     }
   },
@@ -158,6 +254,7 @@
       "client_inputs": "",
       "cycle_days": "",
       "acceptance": "",
+      "price": null,
       "price_terms": "",
       "why_me": "",
       "channel_actions": "",
@@ -179,6 +276,7 @@
       "source_rights": "",
       "cycle_days": "",
       "acceptance": "",
+      "price": null,
       "price_terms": "",
       "why_me": "",
       "channel_actions": "",

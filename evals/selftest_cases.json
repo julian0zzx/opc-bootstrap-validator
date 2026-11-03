@@ -162,67 +162,163 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "主动选择，非逃避职场"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "主动选择，非逃避职场",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "连续 6 个月自主推进"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "连续 6 个月自主推进",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 5,
-       "evidence": "长期承担交付"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "长期承担交付",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 5,
-       "evidence": "被拒 30 次后调整方案"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "被拒 30 次后调整方案",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "3 笔回款记录"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "3 笔回款记录",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
-       "evidence": "作品集 20 个案例"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "作品集 20 个案例",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "boundary_judgment": {
        "score": 5,
-       "evidence": "不服务清单"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "不服务清单",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 5,
-       "evidence": "报价谈判记录"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "报价谈判记录",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "10 个月安全垫"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "10 个月安全垫",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 5,
-       "evidence": "每周 20 小时固定时段"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "每周 20 小时固定时段",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 5,
-       "evidence": "合同模板与风险清单"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "合同模板与风险清单",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "2 个付费客户"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "2 个付费客户",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "客户画像与痛点原话"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "客户画像与痛点原话",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 5,
-       "evidence": "渠道回复率记录"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "渠道回复率记录",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "SOP 与模板"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "SOP 与模板",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "无重资产，零外包"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "无重资产，零外包",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     }
@@ -242,7 +338,13 @@
      "items": {
       "motive_choice": {
        "score": 4,
-       "evidence": "原话记录"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "原话记录",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     }
@@ -334,67 +436,163 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "boundary_judgment": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     }
@@ -423,67 +621,163 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "boundary_judgment": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     }
@@ -518,67 +812,163 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "boundary_judgment": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     },
@@ -605,7 +995,7 @@
       "reached": 18,
       "interviews": 12,
       "advanced": 4,
-      "proposals": 5,
+      "proposals": 3,
       "quotes": 4,
       "payers": 1,
       "payments": 1,
@@ -666,67 +1056,163 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "boundary_judgment": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     }
@@ -1129,7 +1615,13 @@
      "items": {
       "paid_evidence": {
        "score": 4,
-       "evidence": "2 笔回款"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "2 笔回款",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     },
@@ -1188,7 +1680,13 @@
      "items": {
       "paid_evidence": {
        "score": 4,
-       "evidence": "2 笔回款"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "2 笔回款",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     },
@@ -1240,67 +1738,163 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "boundary_judgment": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "2 笔回款"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "2 笔回款",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 4,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "a"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "a",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     },
@@ -1825,23 +2419,53 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
@@ -1849,43 +2473,103 @@
       },
       "boundary_judgment": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "有凭证"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有凭证",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     }
@@ -1934,67 +2618,163 @@
      "items": {
       "motive_choice": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "tolerate_uncertainty": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "long_term_roles": {
        "score": 4,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "rejection_resilience": {
        "score": 4,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "full_cycle_paid": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sellable_skill": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "boundary_judgment": {
        "score": 4,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "sales_learning": {
        "score": 4,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "cash_cushion": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "time_capacity": {
        "score": 4,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "compliance_basics": {
        "score": 4,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "paid_evidence": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "customer_clarity": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "reachable_channel": {
        "score": 4,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "standardizable": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       },
       "light_structure": {
        "score": 5,
-       "evidence": "有记录可查"
+       "evidence": {
+        "when": "2026-03",
+        "who": "客户 A",
+        "what": "有记录可查",
+        "amount": 8000,
+        "proof": "合同与回款记录"
+       }
       }
      }
     },
@@ -2391,6 +3171,226 @@
     "bare_notes_delta": 1,
     "overwrite_recorded": true,
     "bak_written": true
+   }
+  },
+  {
+   "id": "MS-03",
+   "name": "MSO：价格写成「8000 元」被判格式错误，而不是「未填价格」",
+   "kind": "mso",
+   "extends": "MS-02",
+   "patch": {
+    "mso": {
+     "price": "8000 元",
+     "why_me": "经验"
+    }
+   },
+   "expect": {
+    "level": "NOT_READY",
+    "standards.3.pass": false,
+    "standards.1.pass": true,
+    "numeric_fields.price.unparsable": true
+   }
+  },
+  {
+   "id": "MS-04",
+   "name": "MSO：price 未填计入必填字段（20 项口径，不再显示 19/19）",
+   "kind": "mso",
+   "extends": "MS-02",
+   "patch": {
+    "mso": {
+     "price": null,
+     "why_me": "经验"
+    }
+   },
+   "expect": {
+    "level": "INCOMPLETE",
+    "field_count": 20,
+    "missing_fields": ["价格（数值）"],
+    "standards.3.pass": false
+   }
+  },
+  {
+   "id": "MS-05",
+   "name": "MSU（T2）：定价未填同样计入必填字段（20 项口径）",
+   "kind": "mso",
+   "config": {
+    "track": {
+     "key": "T2"
+    },
+    "msu": {
+     "target_audience": "悬疑短篇读者",
+     "consumption_scene": "通勤碎片时间",
+     "unmet_need": "更新不稳定",
+     "no_solution_loss": "弃书",
+     "min_unit": "3 章",
+     "deliverables": "正文",
+     "exclusions": "不含有声",
+     "source_rights": "原创",
+     "cycle_days": 7,
+     "acceptance": "按时更新",
+     "price_terms": "版权 授权 分成 更新 退款 数据 售后",
+     "why_me": "产能稳定",
+     "channel_actions": "番茄小说",
+     "direct_cost": "200",
+     "unit_hours": "6 小时",
+     "gross_profit": "800",
+     "risks": "平台依赖",
+     "stop_loss": "3000",
+     "goal_90d": "1000 追读"
+    }
+   },
+   "expect": {
+    "level": "INCOMPLETE",
+    "field_count": 20,
+    "missing_fields": ["定价（数值）"],
+    "standards.3.pass": false
+   }
+  },
+  {
+   "id": "TP-01",
+   "name": "模板骨架填满后 MSO / MSU 都能达到 7 条全过（骨架必须含 price 数值项）",
+   "kind": "template_ok",
+   "expect": {
+    "problems": []
+   }
+  },
+  {
+   "id": "EV-01",
+   "name": "证据分级：无证据 40 / 旧式自述 60 / 缺凭证 80 / 有凭证 100",
+   "kind": "evidence_grade",
+   "expect": {
+    "total_none": 40.0,
+    "total_legacy": 60.0,
+    "total_partial": 80.0,
+    "total_full": 100.0,
+    "legacy_count": 16,
+    "level_legacy": 1,
+    "level_partial": 3,
+    "level_full": 4,
+    "band_partial": "80–100 具备较好起点，但仍必须先做副业或低风险付费验证",
+    "band_legacy": "60–79 有条件适配，制定 3–6 个月短板修复计划"
+   }
+  },
+  {
+   "id": "AU-01",
+   "name": "数据自洽：漏斗不递进（0 触达却 14 次访谈）判 INCONSISTENT，并压住 assay",
+   "kind": "audit",
+   "config": {
+    "gate3": {
+     "funnel": {
+      "targets": 0,
+      "reached": 0,
+      "interviews": 14,
+      "advanced": 5,
+      "proposals": 4,
+      "quotes": 3,
+      "payers": 1,
+      "payments": 9,
+      "deliveries": 0,
+      "results": 0
+     }
+    }
+   },
+   "expect": {
+    "level": "INCONSISTENT",
+    "block_count": 1,
+    "warn_count": 1,
+    "issues.0.code": "funnel_order",
+    "issues.0.severity": "block"
+   }
+  },
+  {
+   "id": "AU-02",
+   "name": "数据自洽：递进正常的漏斗不误报",
+   "kind": "audit",
+   "config": {
+    "gate3": {
+     "funnel": {
+      "targets": 60,
+      "reached": 26,
+      "interviews": 14,
+      "advanced": 5,
+      "proposals": 4,
+      "quotes": 3,
+      "payers": 1,
+      "payments": 1,
+      "deliveries": 1,
+      "results": 1
+     }
+    }
+   },
+   "expect": {
+    "level": "OK",
+    "block_count": 0,
+    "warn_count": 0
+   }
+  },
+  {
+   "id": "AU-03",
+   "name": "数据自洽：验证路径与漏斗字段不匹配时给 warn，不算矛盾",
+   "kind": "audit",
+   "config": {
+    "track": {
+     "key": "T2"
+    },
+    "gate3": {
+     "funnel": {
+      "targets": 60,
+      "reached": 26,
+      "interviews": 14
+     }
+    }
+   },
+   "expect": {
+    "level": "WARN",
+    "warn_count": 1,
+    "issues.0.code": "track_fields"
+   }
+  },
+  {
+   "id": "PB-01",
+   "name": "追问清单：矛盾优先于证据缺口，且按优先级排序",
+   "kind": "probe",
+   "config": {
+    "gate3": {
+     "funnel": {
+      "targets": 0,
+      "reached": 0,
+      "interviews": 14
+     }
+    },
+    "score": {
+     "items": {
+      "motive_choice": {
+       "score": 5,
+       "evidence": ""
+      }
+     }
+    }
+   },
+   "expect": {
+    "level": "NEEDS_PROBING",
+    "items.0.kind": "consistency",
+    "items.1.kind": "evidence",
+    "items.1.target": "曾独立完成项目并成功收款"
+   }
+  },
+  {
+   "id": "DC-04",
+   "name": "证据卡策略写死在文档里：旧式字符串证据不提供兼容开关",
+   "kind": "docs_contains",
+   "groups": {
+    "README.md": [
+     "不提供兼容开关"
+    ],
+    "SKILL.md": [
+     "不提供兼容开关",
+     "五要素证据卡"
+    ]
+   },
+   "expect": {
+    "rules": 3,
+    "missing": []
    }
   }
  ]
